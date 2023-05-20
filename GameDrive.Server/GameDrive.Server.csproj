@@ -29,4 +29,8 @@
       <ProjectReference Include="..\GameDrive.Server.Domain\GameDrive.Server.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="storage\" />
+    </ItemGroup>
+
 </Project>
