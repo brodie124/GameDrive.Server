@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using GameDrive.Server.Domain.Models;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace GameDrive.Server.Services.Storage;
@@ -37,12 +38,12 @@ public class LocalStorageProvider : IStorageProvider
         if (!Directory.Exists("storage"))
             Directory.CreateDirectory("storage");
         
-        var storageId = Guid.NewGuid();
-        var storageObject = new StorageObject(
-            ClientPath: saveRequest.ClientPath,
-            GameDrivePath: Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
-            Id: storageId
-        );
+        var storageId = Guid.NewGuid(); // Create a new GUID so that we can use it to generate the GameDrivePath
+        var storageObject = new StorageObject() {
+            Id = storageId,
+            ClientPath = saveRequest.ClientPath,
+            GameDrivePath = Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
+        };
 
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
         var writeStream = new StreamWriter(filePath);

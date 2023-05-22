@@ -1,5 +1,6 @@
 using GameDrive.Server.Database;
 using GameDrive.Server.OptionsModels;
+using GameDrive.Server.Services.Repositories;
 using GameDrive.Server.Services.Storage;
 using GameDrive.Server.Tasks.Startup;
 
@@ -11,6 +12,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddScoped<IStorageProvider, LocalStorageProvider>();
         serviceCollection.AddScoped<StorageService>();
+        serviceCollection.AddScoped<StorageObjectRepository>();
         serviceCollection.AddHostedService<MigrateDatabaseTask>();
         return serviceCollection;
     }

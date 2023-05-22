@@ -1,5 +1,6 @@
 using GameDrive.Server.Domain.Models;
 using GameDrive.Server.OptionsModels;
+using GameDrive.Server.Services.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,6 +11,7 @@ public class GameDriveDbContext : DbContext
     private readonly DatabaseOptions _databaseConfig;
 
     public DbSet<User> Users { get; set; } = default!;
+    public DbSet<StorageObject> StorageObjects { get; set; } = default!;
 
     public GameDriveDbContext(IOptions<DatabaseOptions> databaseOptions)
     {
