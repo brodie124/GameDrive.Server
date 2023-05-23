@@ -1,11 +1,13 @@
 using GameDrive.Server.Attributes;
 using GameDrive.Server.Services.Storage;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Net.Http.Headers;
 
 namespace GameDrive.Server.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UploadController : ControllerBase

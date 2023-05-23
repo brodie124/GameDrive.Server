@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGameDriveConfigurationOptions(builder.Configuration);
 builder.Services.AddGameDriveDbContext();
 builder.Services.AddGameDriveServices();
+builder.Services.AddGameDriveAuthentication();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer(); // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerGen();
@@ -19,7 +20,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
