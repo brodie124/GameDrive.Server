@@ -33,7 +33,12 @@ namespace GameDrive.Server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("storage_objects");
                 });
@@ -55,6 +60,22 @@ namespace GameDrive.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
+                });
+
+            modelBuilder.Entity("GameDrive.Server.Domain.Models.StorageObject", b =>
+                {
+                    b.HasOne("GameDrive.Server.Domain.Models.User", "Owner")
+                        .WithMany("StorageObjects")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("GameDrive.Server.Domain.Models.User", b =>
+                {
+                    b.Navigation("StorageObjects");
                 });
 #pragma warning restore 612, 618
         }

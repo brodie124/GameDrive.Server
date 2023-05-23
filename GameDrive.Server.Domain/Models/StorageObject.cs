@@ -10,7 +10,9 @@ public class StorageObject
 {
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
+    public int OwnerId { get; set; }
     public string ClientPath { get; set; } = default!;
     public string GameDrivePath { get; set; } = default!;
-    
+    [ForeignKey(nameof(OwnerId))]
+    public User Owner { get; set; } = default!;
 }

@@ -14,4 +14,6 @@ public class User
     
     [Required]
     public string PasswordHash { get; set; } = default!;
+
+    public ICollection<StorageObject> StorageObjects { get; set; } = new List<StorageObject>();
 }
