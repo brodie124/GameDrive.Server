@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
     }
     
     // TODO: update this function to use values pulled from the configuration file
-    public static IServiceCollection AddGameDriveAuthentication(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddGameDriveAuthentication(this IServiceCollection serviceCollection, JwtOptions jwtOptions)
     {
         serviceCollection
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -53,10 +53,10 @@ public static class ServiceCollectionExtensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "GameDrive",
-                    ValidAudience = "GameDrive",
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes("Some super secret key!")
+                        Encoding.UTF8.GetBytes(jwtOptions.Key)
                     )
                 };
             });
