@@ -1,5 +1,5 @@
 using GameDrive.Server.Extensions;
-using GameDrive.Server.OptionsModels;
+using GameDrive.Server.Models.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
