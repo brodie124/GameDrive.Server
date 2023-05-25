@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace GameDrive.Server.Domain.Models.Responses;
 
 public enum ApiResponseCode
@@ -15,13 +17,20 @@ public class ApiResponse<T>
 {
     public static implicit operator ApiResponse<T>(T obj) => ApiResponse<T>.Success(obj);
 
+    [JsonIgnore]
     public bool IsSuccess => ResponseCode == ApiResponseCode.OK;
-    public ApiResponseCode ResponseCode { get; init; } = ApiResponseCode.OK;
     
-    public Exception? InnerException { get; init; }
-    public string? ErrorMessage { get; init; }
+    [JsonPropertyName("responseCode")]
+    public ApiResponseCode ResponseCode { get; set; } = ApiResponseCode.OK;
     
-    public T? Data { get; init; }
+    [JsonPropertyName("innerException")]
+    public Exception? InnerException { get; set; }
+    
+    [JsonPropertyName("errorMessage")]
+    public string? ErrorMessage { get; set; }
+    
+    [JsonPropertyName("data")]
+    public T? Data { get; set; }
 
     protected ApiResponse()
     {
@@ -56,8 +65,3 @@ public class ApiResponse<T>
         };
     }
 }
-
-// public class ApiResponse : ApiResponse<object>
-// {
-//     public static explicit operator ApiResponse(ApiResponse<object> apiResponse) => (ApiResponse) apiResponse;
-// }
