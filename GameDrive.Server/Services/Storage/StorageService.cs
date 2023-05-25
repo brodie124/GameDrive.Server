@@ -26,6 +26,7 @@ public class StorageService
         try
         {
             var result = await _storageProvider.SaveObjectAsync(new SaveStorageObjectRequest(
+                OwnerId: 0, // TODO: extract this from JWT payload
                 ClientPath: clientPath,
                 MultipartReader: multipartReader
             ), cancellationToken);

@@ -1,5 +1,6 @@
-using System.Net.Http.Headers;
+using Microsoft.Net.Http.Headers;
 using GameDrive.Server.Domain.Models;
+using GameDrive.Server.Utilities;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace GameDrive.Server.Services.Storage;
@@ -26,6 +27,7 @@ public record DownloadStorageObjectResult(
 );
 
 public record SaveStorageObjectRequest(
+    int OwnerId,
     string ClientPath,
     MultipartReader MultipartReader
 );
@@ -41,6 +43,7 @@ public class LocalStorageProvider : IStorageProvider
         var storageId = Guid.NewGuid(); // Create a new GUID so that we can use it to generate the GameDrivePath
         var storageObject = new StorageObject() {
             Id = storageId,
+            OwnerId = saveRequest.OwnerId,
             ClientPath = saveRequest.ClientPath,
             GameDrivePath = Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
         };
@@ -53,11 +56,9 @@ public class LocalStorageProvider : IStorageProvider
         {
             if (!ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var contentDisposition))
                 continue;
-            
-            if (contentDisposition.DispositionType != "form-data" || string.IsNullOrEmpty(contentDisposition.FileName))
-            {
+
+            if (!MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                 continue;
-            }
 
             await section.Body.CopyToAsync(writeStream.BaseStream, cancellationToken);
             section = await saveRequest.MultipartReader.ReadNextSectionAsync(cancellationToken);

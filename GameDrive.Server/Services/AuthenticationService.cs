@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using GameDrive.Server.Domain.Models.TransferObjects;
+using GameDrive.Server.Models;
 using GameDrive.Server.Models.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,14 +19,10 @@ public class AuthenticationService
         _jwtOptions = jwtOptions.Value;
     }
     
-    public string CreateToken(UserDto userDto)
+    public string CreateToken(JwtData jwtData)
     {
-        var claims = new Claim[]
-        {
-            new(ClaimTypes.Name, userDto.Username),
-            new(ClaimTypes.Role, "user"),
-            new(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
-        };
+        var claims = new List<Claim>();
+        claims.AddRange(jwtData.CreateClaims());
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -34,7 +31,8 @@ public class AuthenticationService
             audience: _jwtOptions.Audience,
             claims: claims,
             expires: DateTime.Now.Add(_tokenLifetimeMinutes),
-            signingCredentials: credentials);
+            signingCredentials: credentials
+        );
 
         return new JwtSecurityTokenHandler().WriteToken(descriptor);
     }
