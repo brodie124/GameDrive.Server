@@ -1,6 +1,6 @@
 using System.Text;
 using GameDrive.Server.Database;
-using GameDrive.Server.OptionsModels;
+using GameDrive.Server.Models.Options;
 using GameDrive.Server.Services;
 using GameDrive.Server.Services.Repositories;
 using GameDrive.Server.Services.Storage;

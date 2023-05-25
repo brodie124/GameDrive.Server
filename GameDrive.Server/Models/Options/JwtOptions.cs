@@ -1,4 +1,4 @@
-namespace GameDrive.Server.OptionsModels;
+namespace GameDrive.Server.Models.Options;
 
 public class JwtOptions
 {

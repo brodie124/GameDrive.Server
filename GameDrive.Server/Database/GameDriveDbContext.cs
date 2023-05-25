@@ -1,6 +1,5 @@
 using GameDrive.Server.Domain.Models;
-using GameDrive.Server.OptionsModels;
-using GameDrive.Server.Services.Storage;
+using GameDrive.Server.Models.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
