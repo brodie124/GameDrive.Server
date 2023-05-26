@@ -43,10 +43,6 @@ namespace GameDrive.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("FileDirectory")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("FileExtension")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -98,6 +94,81 @@ namespace GameDrive.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
+                });
+
+            modelBuilder.Entity("GameDrive.Server.Domain.Models.GameProfile", b =>
+                {
+                    b.OwnsOne("GameDrive.Server.Domain.Models.CsvString", "ExcludePatterns", b1 =>
+                        {
+                            b1.Property<int>("GameProfileId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Delimiter")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.HasKey("GameProfileId");
+
+                            b1.ToTable("game_profiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameProfileId");
+                        });
+
+                    b.OwnsOne("GameDrive.Server.Domain.Models.CsvString", "IncludePatterns", b1 =>
+                        {
+                            b1.Property<int>("GameProfileId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Delimiter")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.HasKey("GameProfileId");
+
+                            b1.ToTable("game_profiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameProfileId");
+                        });
+
+                    b.OwnsOne("GameDrive.Server.Domain.Models.CsvString", "SearchableDirectories", b1 =>
+                        {
+                            b1.Property<int>("GameProfileId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Delimiter")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.HasKey("GameProfileId");
+
+                            b1.ToTable("game_profiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameProfileId");
+                        });
+
+                    b.Navigation("ExcludePatterns")
+                        .IsRequired();
+
+                    b.Navigation("IncludePatterns")
+                        .IsRequired();
+
+                    b.Navigation("SearchableDirectories")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GameDrive.Server.Domain.Models.StorageObject", b =>

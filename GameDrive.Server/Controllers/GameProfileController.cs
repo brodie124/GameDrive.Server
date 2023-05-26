@@ -7,16 +7,16 @@ namespace GameDrive.Server.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class GameProfilesController : ControllerBase
+public class GameProfileController : ControllerBase
 {
     private readonly GameProfileRepository _gameProfileRepository;
 
-    public GameProfilesController(GameProfileRepository gameProfileRepository)
+    public GameProfileController(GameProfileRepository gameProfileRepository)
     {
         _gameProfileRepository = gameProfileRepository;
     }
 
-    [HttpGet]
+    [HttpGet("List")]
     public async Task<ApiResponse<IReadOnlyCollection<GameProfile>>> GetGameProfilesAsync()
     {
         return ApiResponse<IReadOnlyCollection<GameProfile>>.Success(await _gameProfileRepository.GetAllAsync());

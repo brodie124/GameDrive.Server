@@ -10,7 +10,7 @@ public class GameProfile
     public int Id { get; set; }
     public int Version { get; set; }
     public string Name { get; set; } = default!;
-    public ICollection<string> SearchableDirectories = new List<string>();
-    public ICollection<string> IncludePatterns = new List<string>();
-    public ICollection<string> ExcludePatterns = new List<string>();
+    public CsvString SearchableDirectories { get; set; } = new CsvString(";");
+    public CsvString IncludePatterns { get; set; } = new CsvString(";");
+    public CsvString ExcludePatterns { get; set; } = new CsvString(";");
 }

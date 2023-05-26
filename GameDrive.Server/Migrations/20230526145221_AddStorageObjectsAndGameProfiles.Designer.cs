@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameDrive.Server.Migrations
 {
     [DbContext(typeof(GameDriveDbContext))]
-    [Migration("20230526110511_ExpandStorageObjects")]
-    partial class ExpandStorageObjects
+    [Migration("20230526145221_AddStorageObjectsAndGameProfiles")]
+    partial class AddStorageObjectsAndGameProfiles
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,10 +45,6 @@ namespace GameDrive.Server.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("FileDirectory")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<string>("FileExtension")
                         .IsRequired()
@@ -101,6 +97,81 @@ namespace GameDrive.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
+                });
+
+            modelBuilder.Entity("GameDrive.Server.Domain.Models.GameProfile", b =>
+                {
+                    b.OwnsOne("GameDrive.Server.Domain.Models.CsvString", "ExcludePatterns", b1 =>
+                        {
+                            b1.Property<int>("GameProfileId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Delimiter")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.HasKey("GameProfileId");
+
+                            b1.ToTable("game_profiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameProfileId");
+                        });
+
+                    b.OwnsOne("GameDrive.Server.Domain.Models.CsvString", "IncludePatterns", b1 =>
+                        {
+                            b1.Property<int>("GameProfileId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Delimiter")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.HasKey("GameProfileId");
+
+                            b1.ToTable("game_profiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameProfileId");
+                        });
+
+                    b.OwnsOne("GameDrive.Server.Domain.Models.CsvString", "SearchableDirectories", b1 =>
+                        {
+                            b1.Property<int>("GameProfileId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Delimiter")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.HasKey("GameProfileId");
+
+                            b1.ToTable("game_profiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GameProfileId");
+                        });
+
+                    b.Navigation("ExcludePatterns")
+                        .IsRequired();
+
+                    b.Navigation("IncludePatterns")
+                        .IsRequired();
+
+                    b.Navigation("SearchableDirectories")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GameDrive.Server.Domain.Models.StorageObject", b =>
