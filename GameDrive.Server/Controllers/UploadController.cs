@@ -1,4 +1,5 @@
 using GameDrive.Server.Attributes;
+using GameDrive.Server.Domain.Models.Responses;
 using GameDrive.Server.Extensions;
 using GameDrive.Server.Services.Storage;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ public class UploadController : ControllerBase
 
     [HttpPost]
     [DisableFormValueModelBinding]
-    public async Task<IActionResult> UploadFileAsync(
+    public async Task<ApiResponse<bool>> UploadFileAsync(
         [FromQuery] int gameProfileId, 
         [FromQuery] string fileNameWithExtension,
         [FromQuery] string fileHash,
@@ -49,10 +50,10 @@ public class UploadController : ControllerBase
             FileLastModifiedDate: fileLastModifiedDate,
         MultipartReader: reader
         ), cancellationToken);
-        
-        if (result is null)
-            return UnprocessableEntity();
 
-        return Ok();
+        if (result is null)
+            return false;
+
+        return true;
     }
 }
