@@ -11,15 +11,15 @@ public class UpdateGameProfilesTask : IHostedService
         new GameProfile
         {
             Name = "RimWorld",
-            Version = 1,
-            SearchableDirectories = new List<string>()
+            Version = 2,
+            SearchableDirectories = new CsvString(new List<string>
             {
-                @"%APPDATA%\..\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\Saves"
-            },
-            IncludePatterns = new List<string>()
+                @"<winLocalAppData>\Ludeon Studios\RimWorld by Ludeon Studios\Saves"
+            }, ";"),
+            IncludePatterns = new CsvString(new List<string>
             {
                 @".*\.rws$"
-            }
+            }, ";")
         }
     };
 
@@ -55,8 +55,12 @@ public class UpdateGameProfilesTask : IHostedService
                 continue;
             }
 
-            profile.Id = currentProfile.Id;
-            await gameProfileRepository.UpdateAsync(profile);
+            currentProfile.Name = profile.Name;
+            currentProfile.Version = profile.Version;
+            currentProfile.SearchableDirectories = profile.SearchableDirectories;
+            currentProfile.IncludePatterns = profile.IncludePatterns;
+            currentProfile.ExcludePatterns = profile.ExcludePatterns;
+            await gameProfileRepository.UpdateAsync(currentProfile);
         }
 
         await gameProfileRepository.SaveChangesAsync();
