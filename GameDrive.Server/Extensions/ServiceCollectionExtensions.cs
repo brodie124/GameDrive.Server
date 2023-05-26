@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IStorageProvider, LocalStorageProvider>();
         serviceCollection.AddScoped<StorageService>();
         serviceCollection.AddScoped<AuthenticationService>();
+        serviceCollection.AddScoped<ManifestService>();
         serviceCollection.AddScoped<StorageObjectRepository>();
         serviceCollection.AddScoped<UserRepository>();
         serviceCollection.AddScoped<GameProfileRepository>();
