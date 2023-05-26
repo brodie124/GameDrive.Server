@@ -26,6 +26,8 @@ public class UploadController : ControllerBase
         [FromQuery] int gameProfileId, 
         [FromQuery] string fileNameWithExtension,
         [FromQuery] string fileHash,
+        [FromQuery] DateTime fileCreatedDate,
+        [FromQuery] DateTime fileLastModifiedDate,
         CancellationToken cancellationToken = default
     )
     {
@@ -43,7 +45,9 @@ public class UploadController : ControllerBase
             FileName: fileName,
             FileExtension: extension,
             FileHash: fileHash,
-            MultipartReader: reader
+            FileCreatedDate: fileCreatedDate,
+            FileLastModifiedDate: fileLastModifiedDate,
+        MultipartReader: reader
         ), cancellationToken);
         
         if (result is null)

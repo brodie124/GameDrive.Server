@@ -17,6 +17,10 @@ public class StorageObject
     public string FileExtension { get; set; } = default!;
     public string FileName { get; set; } = default!;
     public string FileHash { get; set; } = default!;
+    
+    public DateTime UploadedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime LastModifiedDate { get; set; }
    
     public string GameDrivePath { get; set; } = default!;
 

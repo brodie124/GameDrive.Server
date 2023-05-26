@@ -34,6 +34,9 @@ public record SaveStorageObjectRequest(
     string FileExtension,
     string FileHash,
     
+    DateTime FileCreatedDate,
+    DateTime FileLastModifiedDate,
+    
     MultipartReader MultipartReader
 );
 
@@ -56,6 +59,10 @@ public class LocalStorageProvider : IStorageProvider
             
             FileName = saveRequest.FileName,
             FileExtension = saveRequest.FileExtension,
+            
+            UploadedDate = DateTime.Now,
+            CreatedDate = saveRequest.FileCreatedDate,
+            LastModifiedDate = saveRequest.FileLastModifiedDate,
 
             GameDrivePath = Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
         };
