@@ -25,7 +25,6 @@ public class UploadController : ControllerBase
     public async Task<IActionResult> UploadFileAsync(
         [FromQuery] int gameProfileId, 
         [FromQuery] string fileNameWithExtension,
-        [FromQuery] string fileDirectory,
         [FromQuery] string fileHash,
         CancellationToken cancellationToken = default
     )
@@ -43,7 +42,6 @@ public class UploadController : ControllerBase
             GameProfileId: gameProfileId,
             FileName: fileName,
             FileExtension: extension,
-            FileDirectory: fileDirectory,
             FileHash: fileHash,
             MultipartReader: reader
         ), cancellationToken);

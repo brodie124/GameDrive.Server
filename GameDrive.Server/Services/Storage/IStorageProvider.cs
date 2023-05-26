@@ -32,7 +32,6 @@ public record SaveStorageObjectRequest(
     
     string FileName,
     string FileExtension,
-    string FileDirectory,
     string FileHash,
     
     MultipartReader MultipartReader
@@ -57,8 +56,7 @@ public class LocalStorageProvider : IStorageProvider
             
             FileName = saveRequest.FileName,
             FileExtension = saveRequest.FileExtension,
-            FileDirectory = saveRequest.FileDirectory,
-            
+
             GameDrivePath = Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
         };
 

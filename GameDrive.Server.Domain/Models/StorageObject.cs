@@ -12,12 +12,10 @@ public class StorageObject
     public Guid Id { get; set; } = Guid.NewGuid();
     public int OwnerId { get; set; }
     public int GameProfileId { get; set; }
-
     
     public long FileSizeBytes { get; set; }
     public string FileExtension { get; set; } = default!;
     public string FileName { get; set; } = default!;
-    public string FileDirectory { get; set; } = default!;
     public string FileHash { get; set; } = default!;
    
     public string GameDrivePath { get; set; } = default!;
