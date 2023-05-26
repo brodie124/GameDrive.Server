@@ -15,7 +15,7 @@ public enum ApiResponseCode
 
 public class ApiResponse<T>
 {
-    public static implicit operator ApiResponse<T>(T obj) => ApiResponse<T>.Success(obj);
+    public static implicit operator ApiResponse<T>(T? obj) => ApiResponse<T>.Success(obj);
 
     [JsonIgnore]
     public bool IsSuccess => ResponseCode == ApiResponseCode.OK;
@@ -23,7 +23,7 @@ public class ApiResponse<T>
     [JsonPropertyName("responseCode")]
     public ApiResponseCode ResponseCode { get; set; } = ApiResponseCode.OK;
     
-    [JsonPropertyName("innerException")]
+    [JsonIgnore]
     public Exception? InnerException { get; set; }
     
     [JsonPropertyName("errorMessage")]
