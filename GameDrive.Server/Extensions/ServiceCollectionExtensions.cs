@@ -19,7 +19,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<AuthenticationService>();
         serviceCollection.AddScoped<StorageObjectRepository>();
         serviceCollection.AddScoped<UserRepository>();
+        serviceCollection.AddScoped<GameProfileRepository>();
         serviceCollection.AddHostedService<MigrateDatabaseTask>();
+        serviceCollection.AddHostedService<UpdateGameProfilesTask>();
         return serviceCollection;
     }
     

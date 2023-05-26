@@ -36,7 +36,10 @@ public class AccountController : ControllerBase
         }
 
         var userDto = users.First().ToDto();
-        var jwtToken = _authenticationService.CreateToken(userDto);
+        var jwtToken = _authenticationService.CreateToken(new JwtData(
+            UserId: userDto.Id,
+            Username: userDto.Username
+        ));
         return ApiResponse<string>.Success(jwtToken);
     }
 

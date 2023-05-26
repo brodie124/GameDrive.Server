@@ -28,7 +28,13 @@ public record DownloadStorageObjectResult(
 
 public record SaveStorageObjectRequest(
     int OwnerId,
-    string ClientPath,
+    int GameProfileId,
+    
+    string FileName,
+    string FileExtension,
+    string FileDirectory,
+    string FileHash,
+    
     MultipartReader MultipartReader
 );
 
@@ -44,7 +50,15 @@ public class LocalStorageProvider : IStorageProvider
         var storageObject = new StorageObject() {
             Id = storageId,
             OwnerId = saveRequest.OwnerId,
-            ClientPath = saveRequest.ClientPath,
+            GameProfileId = saveRequest.GameProfileId,
+            
+            FileSizeBytes = 0,
+            FileHash = "",
+            
+            FileName = saveRequest.FileName,
+            FileExtension = saveRequest.FileExtension,
+            FileDirectory = saveRequest.FileDirectory,
+            
             GameDrivePath = Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
         };
 
@@ -59,13 +73,18 @@ public class LocalStorageProvider : IStorageProvider
 
             if (!MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                 continue;
+            
 
             await section.Body.CopyToAsync(writeStream.BaseStream, cancellationToken);
             section = await saveRequest.MultipartReader.ReadNextSectionAsync(cancellationToken);
         }
         
+        var fileSize = writeStream.BaseStream.Position;
         await writeStream.FlushAsync();
         writeStream.Close();
+        
+        storageObject.FileSizeBytes = fileSize;
+        storageObject.FileHash = saveRequest.FileHash; // TODO: change this so that we compare the hash provided with a calculated hash on the uploaded file to verify integrity
 
         return new SaveStorageObjectResult(
             Success: true,

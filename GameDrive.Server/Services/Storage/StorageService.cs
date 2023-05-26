@@ -21,16 +21,11 @@ public class StorageService
         _storageObjectRepository = storageObjectRepository;
     }
 
-    public async Task<StorageObject?> UploadFileAsync(string clientPath, MultipartReader multipartReader, CancellationToken cancellationToken = default)
+    public async Task<StorageObject?> UploadFileAsync(SaveStorageObjectRequest saveStorageObjectRequest, CancellationToken cancellationToken = default)
     {
         try
         {
-            var result = await _storageProvider.SaveObjectAsync(new SaveStorageObjectRequest(
-                OwnerId: 0, // TODO: extract this from JWT payload
-                ClientPath: clientPath,
-                MultipartReader: multipartReader
-            ), cancellationToken);
-
+            var result = await _storageProvider.SaveObjectAsync(saveStorageObjectRequest, cancellationToken);
             if (!result.Success)
                 return null;
 
@@ -41,7 +36,7 @@ public class StorageService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred whilst uploading file (\'{ClientPath}\')", clientPath);
+            _logger.LogError(ex, "An exception occurred whilst uploading file (\'{FileName}\')", saveStorageObjectRequest.FileName);
             return null;
         }
     }

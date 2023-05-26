@@ -1,4 +1,5 @@
 using GameDrive.Server.Attributes;
+using GameDrive.Server.Extensions;
 using GameDrive.Server.Services.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,14 +22,32 @@ public class UploadController : ControllerBase
 
     [HttpPost]
     [DisableFormValueModelBinding]
-    public async Task<IActionResult> UploadFileAsync(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UploadFileAsync(
+        [FromQuery] int gameProfileId, 
+        [FromQuery] string fileNameWithExtension,
+        [FromQuery] string fileDirectory,
+        [FromQuery] string fileHash,
+        CancellationToken cancellationToken = default
+    )
     {
+        var jwtData = Request.GetJwtDataFromRequest();
         var boundary = HeaderUtilities.RemoveQuotes(
             MediaTypeHeaderValue.Parse(Request.ContentType).Boundary
         ).Value;
+        
         var reader = new MultipartReader(boundary, Request.Body);
-
-        var result = await _storageService.UploadFileAsync("testfile.json", reader, cancellationToken);
+        var fileName = Path.GetFileNameWithoutExtension(fileNameWithExtension);
+        var extension = Path.GetExtension(fileNameWithExtension);
+        var result = await _storageService.UploadFileAsync(new SaveStorageObjectRequest(
+            OwnerId: jwtData.UserId,
+            GameProfileId: gameProfileId,
+            FileName: fileName,
+            FileExtension: extension,
+            FileDirectory: fileDirectory,
+            FileHash: fileHash,
+            MultipartReader: reader
+        ), cancellationToken);
+        
         if (result is null)
             return UnprocessableEntity();
 

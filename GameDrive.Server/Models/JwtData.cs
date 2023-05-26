@@ -7,7 +7,7 @@ public record JwtData(
     string Username
 ) 
 {
-    public Claim[] CreateClaims()
+    public IEnumerable<Claim> CreateClaims()
     {
         return new Claim[]
         {
@@ -17,10 +17,11 @@ public record JwtData(
         };
     }
 
-    public static JwtData FromClaims(Claim[] claims)
+    public static JwtData FromClaims(IEnumerable<Claim> claims)
     {
-        var userIdString = claims.First(x => x.ValueType == ClaimTypes.NameIdentifier).Value;
-        var username = claims.First(x => x.ValueType == ClaimTypes.Name).Value;
+        var claimsArr = claims.ToList();
+        var userIdString = claimsArr.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        var username = claimsArr.First(x => x.Type == ClaimTypes.Name).Value;
         if (!int.TryParse(userIdString, out var userId))
             throw new ArgumentException("JWT UserId must be of type int!");
 

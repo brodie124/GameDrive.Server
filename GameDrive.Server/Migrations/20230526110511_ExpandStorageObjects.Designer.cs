@@ -3,6 +3,7 @@ using System;
 using GameDrive.Server.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameDrive.Server.Migrations
 {
     [DbContext(typeof(GameDriveDbContext))]
-    partial class GameDriveDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230526110511_ExpandStorageObjects")]
+    partial class ExpandStorageObjects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
