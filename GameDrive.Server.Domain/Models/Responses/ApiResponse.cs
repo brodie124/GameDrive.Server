@@ -8,8 +8,12 @@ public enum ApiResponseCode
     GenericError = 2,
     
     #region Authentication
-    AuthInvalidCredentials = 3,
-    AuthUsernameTaken = 4,
+    AuthInvalidCredentials = 101,
+    AuthUsernameTaken = 102,
+    #endregion
+    
+    #region Storage Objects
+    StorageObjectNotFound = 601,
     #endregion
 }
 
