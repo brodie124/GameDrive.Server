@@ -44,13 +44,13 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("SignUp")]
-    public async ValueTask<ApiResponse<User>> SignUp([FromBody] CreateUserRequest createUserRequest)
+    public async ValueTask<ApiResponse<UserDto>> SignUp([FromBody] CreateUserRequest createUserRequest)
     {
         var existingUsers = await _userRepository.FindAsync(x =>
             x.Username.Equals(createUserRequest.Username));
         if (existingUsers.Any())
         {
-            return ApiResponse<User>.Failure("The username provided is already taken.",
+            return ApiResponse<UserDto>.Failure("The username provided is already taken.",
                 ApiResponseCode.AuthUsernameTaken);
         }
 
@@ -63,6 +63,6 @@ public class AccountController : ControllerBase
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
         
-        return user;
+        return user.ToDto();
     }
 }
