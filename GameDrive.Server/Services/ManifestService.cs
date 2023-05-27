@@ -23,37 +23,30 @@ public class ManifestService
                 .FindAsync(x => x.OwnerId == userId && x.GameProfileId == fileManifest.GameProfileId))
             .OrderByDescending(x => x.UploadedDate)
             .ToList();
-        var t = new Dictionary<Guid, ManifestFileReport>();
+        var manifestFileReports = new Dictionary<Guid, ManifestFileReport>();
         foreach (var entry in fileManifest.Entries)
         {
             var storageObj = storageObjects.FirstOrDefault(x => x.FileName == entry.FileName);
-            if (storageObj is null)
-            {
-                // t.Add(entry.Guid, ManifestComparisonResult.New);
-                t.Add(entry.Guid, new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.New));
-                continue;
-            }
-            
-            if (entry.FileHash == storageObj.FileHash)
-            {
-                // t.Add(entry.Guid, ManifestComparisonResult.Same);
-                t.Add(entry.Guid, new ManifestFileReport(FileUploadState.Ignore, FileDiffState.Same));
-                continue;
-            }
-
-            switch (entry.LastModifiedDate.CompareTo(storageObj.LastModifiedDate))
-            {
-                case > 0:
-                    // t.Add(entry.Guid, ManifestComparisonResult.Newer);
-                    t.Add(entry.Guid, new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.Newer));
-                    continue;
-                case < 0:
-                    // t.Add(entry.Guid, ManifestComparisonResult.Older);
-                    t.Add(entry.Guid, new ManifestFileReport(FileUploadState.Ignore, FileDiffState.Older));
-                    continue;
-            }
+            var fileReport = CompareManifestEntry(entry, storageObj);
+            manifestFileReports.Add(entry.Guid, fileReport);
         }
 
-        return t;
+        return manifestFileReports;
+    }
+
+    private ManifestFileReport CompareManifestEntry(ManifestEntry entry, StorageObject? storageObject)
+    {
+        if (storageObject is null)
+            return new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.New);
+        
+        if (entry.FileHash == storageObject.FileHash)
+            return new ManifestFileReport(FileUploadState.Ignore, FileDiffState.Same);
+
+        return entry.LastModifiedDate.CompareTo(storageObject.LastModifiedDate) switch
+        {
+            > 0 => new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.Newer),
+            < 0 => new ManifestFileReport(FileUploadState.Ignore, FileDiffState.Older),
+            _ => new ManifestFileReport(FileUploadState.Conflict, FileDiffState.Conflict)
+        };
     }
 }

@@ -25,7 +25,9 @@ public class ManifestFileReport
 public enum FileUploadState
 {
     UploadRequested,
-    Ignore
+    DownloadAdvised,
+    Ignore,
+    Conflict
 }
 
 public enum FileDiffState
@@ -34,5 +36,6 @@ public enum FileDiffState
     Newer,
     Older,
     Removed,
-    Same
+    Same,
+    Conflict
 }
