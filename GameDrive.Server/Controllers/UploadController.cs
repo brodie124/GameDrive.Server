@@ -38,13 +38,11 @@ public class UploadController : ControllerBase
         ).Value;
         
         var reader = new MultipartReader(boundary, Request.Body);
-        var fileName = Path.GetFileNameWithoutExtension(fileNameWithExtension);
-        var extension = Path.GetExtension(fileNameWithExtension);
+        var fileName = Path.GetFileName(fileNameWithExtension); // File name with extension
         var result = await _storageService.UploadFileAsync(new SaveStorageObjectRequest(
             OwnerId: jwtData.UserId,
             GameProfileId: gameProfileId,
             FileName: fileName,
-            FileExtension: extension,
             FileHash: fileHash,
             FileCreatedDate: fileCreatedDate,
             FileLastModifiedDate: fileLastModifiedDate,

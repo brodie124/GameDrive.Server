@@ -31,7 +31,6 @@ public record SaveStorageObjectRequest(
     int GameProfileId,
     
     string FileName,
-    string FileExtension,
     string FileHash,
     
     DateTime FileCreatedDate,
@@ -58,7 +57,6 @@ public class LocalStorageProvider : IStorageProvider
             FileHash = "",
             
             FileName = saveRequest.FileName,
-            FileExtension = saveRequest.FileExtension,
             
             UploadedDate = DateTime.Now,
             CreatedDate = saveRequest.FileCreatedDate,
