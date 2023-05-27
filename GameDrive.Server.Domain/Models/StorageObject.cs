@@ -24,7 +24,9 @@ public class StorageObject
    
     public string GameDrivePath { get; set; } = default!;
 
-    
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedDate { get; set; }
+
     [ForeignKey(nameof(OwnerId))] 
     public User Owner { get; set; } = default!;
     
