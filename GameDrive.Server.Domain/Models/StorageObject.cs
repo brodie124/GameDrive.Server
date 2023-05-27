@@ -14,8 +14,7 @@ public class StorageObject
     public int GameProfileId { get; set; }
     
     public long FileSizeBytes { get; set; }
-    public string FileExtension { get; set; } = default!;
-    public string FileName { get; set; } = default!;
+    public string FileNameWithExtension { get; set; } = default!;
     public string FileHash { get; set; } = default!;
     
     public DateTime UploadedDate { get; set; }

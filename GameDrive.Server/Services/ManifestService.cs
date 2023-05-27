@@ -26,7 +26,7 @@ public class ManifestService
         var manifestFileReports = new Dictionary<Guid, ManifestFileReport>();
         foreach (var entry in fileManifest.Entries)
         {
-            var storageObj = storageObjects.FirstOrDefault(x => x.FileName == entry.FileName);
+            var storageObj = storageObjects.FirstOrDefault(x => x.FileNameWithExtension == entry.FileName);
             var fileReport = CompareManifestEntry(entry, storageObj);
             manifestFileReports.Add(entry.Guid, fileReport);
         }

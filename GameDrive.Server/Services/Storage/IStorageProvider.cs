@@ -56,7 +56,7 @@ public class LocalStorageProvider : IStorageProvider
             FileSizeBytes = 0,
             FileHash = "",
             
-            FileName = saveRequest.FileName,
+            FileNameWithExtension = saveRequest.FileName,
             
             UploadedDate = DateTime.Now,
             CreatedDate = saveRequest.FileCreatedDate,
