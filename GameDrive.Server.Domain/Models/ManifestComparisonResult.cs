@@ -4,14 +4,17 @@ namespace GameDrive.Server.Domain.Models;
 
 public class ManifestFileReport
 {
-    [JsonPropertyName("storageObjectId")]
-    public Guid? StorageObjectId { get; set; }
-    
     [JsonPropertyName("uploadState")]
     public FileUploadState UploadState { get; set; }
     
     [JsonPropertyName("diffState")]
     public  FileDiffState DiffState { get; set; }
+    
+    [JsonPropertyName("storageObjectId")]
+    public Guid? StorageObjectId { get; set; }
+
+    [JsonPropertyName("storageObjectHash")]
+    public string? StorageObjectHash { get; set; }
 
     public ManifestFileReport()
     {
@@ -27,6 +30,7 @@ public class ManifestFileReport
         UploadState = uploadState;
         DiffState = diffState;
         StorageObjectId = storageObject?.Id;
+        StorageObjectHash = storageObject?.FileHash;
     }
 }
 
