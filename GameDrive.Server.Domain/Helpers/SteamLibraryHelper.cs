@@ -23,8 +23,16 @@ public class SteamLibraryHelper
                 var library = folder.Value;
                 var libraryPath = library.path;
 
+                var libraryApps = library.apps;
+                var installedAppIds = new List<string>();
+                foreach (var installData in libraryApps)
+                {
+                    installedAppIds.Add(installData.Key.ToString());
+                }
+
                 steamLibraries.Add(new SteamLibraryFolder(
-                    Path: libraryPath.ToString() ?? ""
+                    Path: Path.Join(libraryPath.ToString() ?? "", "steamapps").ToString(),
+                    InstalledAppIds: installedAppIds
                 ));
             }
 
@@ -46,4 +54,7 @@ public class SteamLibraryHelper
     }
 }
 
-public record SteamLibraryFolder(string Path);
+public record SteamLibraryFolder(
+    string Path, 
+    IReadOnlyList<string> InstalledAppIds
+);
