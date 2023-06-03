@@ -11,7 +11,7 @@ public class StorageObject
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
     public int OwnerId { get; set; }
-    public int GameProfileId { get; set; }
+    public string BucketId { get; set; }
     
     public long FileSizeBytes { get; set; }
     public string FileNameWithExtension { get; set; } = default!;
@@ -29,6 +29,6 @@ public class StorageObject
     [ForeignKey(nameof(OwnerId))] 
     public User Owner { get; set; } = default!;
     
-    [ForeignKey(nameof(GameProfileId))] 
-    public GameProfile GameProfile { get; set; } = default!;
+    [ForeignKey(nameof(BucketId))] 
+    public Bucket Bucket { get; set; } = default!;
 }

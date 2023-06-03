@@ -28,7 +28,7 @@ public record DownloadStorageObjectResult(
 
 public record SaveStorageObjectRequest(
     int OwnerId,
-    int GameProfileId,
+    string BucketId,
     
     string FileName,
     string FileHash,
@@ -51,7 +51,7 @@ public class LocalStorageProvider : IStorageProvider
         var storageObject = new StorageObject() {
             Id = storageId,
             OwnerId = saveRequest.OwnerId,
-            GameProfileId = saveRequest.GameProfileId,
+            BucketId = saveRequest.BucketId,
             
             FileSizeBytes = 0,
             FileHash = "",

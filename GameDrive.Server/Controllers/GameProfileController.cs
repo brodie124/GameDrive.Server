@@ -17,9 +17,9 @@ public class GameProfileController : ControllerBase
     }
 
     [HttpGet("List")]
-    public async Task<ApiResponse<IReadOnlyCollection<GameProfile>>> GetGameProfilesAsync()
+    public async Task<ApiResponse<IReadOnlyCollection<Bucket>>> GetGameProfilesAsync()
     {
-        return ApiResponse<IReadOnlyCollection<GameProfile>>.Success(await _gameProfileRepository.GetAllAsync());
+        return ApiResponse<IReadOnlyCollection<Bucket>>.Success(await _gameProfileRepository.GetAllAsync());
     }
 
 }

@@ -20,7 +20,7 @@ public class ManifestService
     public async Task<Dictionary<Guid, ManifestFileReport>> GenerateComparisonReport(int userId, FileManifest fileManifest)
     {
         var storageObjects = (await _storageObjectRepository
-                .FindAsync(x => x.OwnerId == userId && x.GameProfileId == fileManifest.GameProfileId))
+                .FindAsync(x => x.OwnerId == userId && x.BucketId == fileManifest.BucketId))
             .OrderByDescending(x => x.UploadedDate)
             .ToList();
         var manifestFileReports = new Dictionary<Guid, ManifestFileReport>();

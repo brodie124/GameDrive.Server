@@ -24,7 +24,7 @@ public class UploadController : ControllerBase
     [HttpPost]
     [DisableFormValueModelBinding]
     public async Task<ApiResponse<bool>> UploadFileAsync(
-        [FromQuery] int gameProfileId, 
+        [FromQuery] string bucketId, 
         [FromQuery] string fileNameWithExtension,
         [FromQuery] string fileHash,
         [FromQuery] DateTime fileCreatedDate,
@@ -41,7 +41,7 @@ public class UploadController : ControllerBase
         var fileName = Path.GetFileName(fileNameWithExtension); // File name with extension
         var result = await _storageService.UploadFileAsync(new SaveStorageObjectRequest(
             OwnerId: jwtData.UserId,
-            GameProfileId: gameProfileId,
+            BucketId: bucketId,
             FileName: fileName,
             FileHash: fileHash,
             FileCreatedDate: fileCreatedDate,
