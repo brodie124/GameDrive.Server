@@ -48,6 +48,7 @@ public enum FileDiffState
     Newer,
     Older,
     Removed,
+    Missing,
     Same,
     Conflict
 }

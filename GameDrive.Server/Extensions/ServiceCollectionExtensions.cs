@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<ManifestService>();
         serviceCollection.AddScoped<StorageObjectRepository>();
         serviceCollection.AddScoped<UserRepository>();
-        serviceCollection.AddScoped<GameProfileRepository>();
+        serviceCollection.AddScoped<BucketRepository>();
         serviceCollection.AddHostedService<MigrateDatabaseTask>();
         return serviceCollection;
     }

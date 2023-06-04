@@ -29,13 +29,11 @@ public record DownloadStorageObjectResult(
 public record SaveStorageObjectRequest(
     int OwnerId,
     string BucketId,
-    
+    string BucketName,
     string FileName,
     string FileHash,
-    
     DateTime FileCreatedDate,
     DateTime FileLastModifiedDate,
-    
     MultipartReader MultipartReader
 );
 

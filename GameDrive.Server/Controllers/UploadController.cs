@@ -25,6 +25,7 @@ public class UploadController : ControllerBase
     [DisableFormValueModelBinding]
     public async Task<ApiResponse<bool>> UploadFileAsync(
         [FromQuery] string bucketId, 
+        [FromQuery] string bucketName,
         [FromQuery] string fileNameWithExtension,
         [FromQuery] string fileHash,
         [FromQuery] DateTime fileCreatedDate,
@@ -42,6 +43,7 @@ public class UploadController : ControllerBase
         var result = await _storageService.UploadFileAsync(new SaveStorageObjectRequest(
             OwnerId: jwtData.UserId,
             BucketId: bucketId,
+            BucketName: bucketName,
             FileName: fileName,
             FileHash: fileHash,
             FileCreatedDate: fileCreatedDate,

@@ -19,27 +19,41 @@ public class ManifestService
 
     public async Task<Dictionary<Guid, ManifestFileReport>> GenerateComparisonReport(int userId, FileManifest fileManifest)
     {
-        var storageObjects = (await _storageObjectRepository
+        var storageObjectComparisonQueue = (await _storageObjectRepository
                 .FindAsync(x => x.OwnerId == userId && x.BucketId == fileManifest.BucketId))
             .OrderByDescending(x => x.UploadedDate)
             .ToList();
+        
         var manifestFileReports = new Dictionary<Guid, ManifestFileReport>();
-        foreach (var entry in fileManifest.Entries)
-        {
-            var storageObj = storageObjects.FirstOrDefault(x => x.FileNameWithExtension == entry.FileName);
-            var fileReport = CompareManifestEntry(entry, storageObj);
-            manifestFileReports.Add(entry.Guid, fileReport);
-        }
+        var longestQueue = Math.Max(storageObjectComparisonQueue.Count, fileManifest.Entries.Count);
 
+        for (var i = 0; i < longestQueue; i++)
+        {
+            var entry = fileManifest.Entries.ElementAtOrDefault(i);
+            var storageObject = entry is not null
+                ? storageObjectComparisonQueue.FirstOrDefault(x => x.FileNameWithExtension == entry.FileName)
+                : storageObjectComparisonQueue.FirstOrDefault();
+            
+            if(storageObject is not null)
+                storageObjectComparisonQueue.Remove(storageObject);
+            
+            var fileReport = CompareManifestEntry(entry, storageObject);
+            manifestFileReports.Add(entry?.Guid ?? Guid.Empty, fileReport);
+        }
+        
         return manifestFileReports;
     }
 
-    private ManifestFileReport CompareManifestEntry(ManifestEntry entry, StorageObject? storageObject)
+    private ManifestFileReport CompareManifestEntry(ManifestEntry? entry, StorageObject? storageObject)
     {
         // If the storage object does not exist then the client-side file must be new
         if (storageObject is null)
             return new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.New, null);
-
+        
+        // If the client-side entry does not exist then it must be either missing or deleted on the client
+        if (entry is null)
+            return new ManifestFileReport(FileUploadState.DownloadAdvised, FileDiffState.Missing, storageObject);
+            
         if (storageObject.IsDeleted)
         {
             if (storageObject.DeletedDate is null)
