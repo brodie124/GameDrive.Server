@@ -9,9 +9,7 @@ public class FileManifest
 public class ManifestEntry
 {
     public Guid Guid { get; set; }
-    
-    public string FullClientPath { get; set; }
-    public string FileName { get; set; }
+    public string RelativePath { get; set; }
     public string FileHash { get; set; }
     public long FileSize { get; set; }
     public DateTime LastModifiedDate { get; set; }

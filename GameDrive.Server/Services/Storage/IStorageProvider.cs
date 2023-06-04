@@ -30,7 +30,7 @@ public record SaveStorageObjectRequest(
     int OwnerId,
     string BucketId,
     string BucketName,
-    string FileName,
+    string GdFilePath,
     string FileHash,
     DateTime FileCreatedDate,
     DateTime FileLastModifiedDate,
@@ -54,7 +54,7 @@ public class LocalStorageProvider : IStorageProvider
             FileSizeBytes = 0,
             FileHash = "",
             
-            FileNameWithExtension = saveRequest.FileName,
+            ClientRelativePath = saveRequest.GdFilePath,
             
             UploadedDate = DateTime.Now,
             CreatedDate = saveRequest.FileCreatedDate,
@@ -75,7 +75,6 @@ public class LocalStorageProvider : IStorageProvider
             if (!MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                 continue;
             
-
             await section.Body.CopyToAsync(writeStream.BaseStream, cancellationToken);
             section = await saveRequest.MultipartReader.ReadNextSectionAsync(cancellationToken);
         }

@@ -12,7 +12,10 @@ public static class GdFileExtensionBlockList
         ".rar",
         ".zip",
         ".vdf",
-        ".ini"
+        ".ini",
+        ".bak",
+        ".log",
+        ".tmp",
     };
 
     public static bool IsAllowed(string path)

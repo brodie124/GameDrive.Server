@@ -14,7 +14,7 @@ public class StorageObject
     public string BucketId { get; set; }
     
     public long FileSizeBytes { get; set; }
-    public string FileNameWithExtension { get; set; } = default!;
+    public string ClientRelativePath { get; set; } = default!;
     public string FileHash { get; set; } = default!;
     
     public DateTime UploadedDate { get; set; }

@@ -17,28 +17,28 @@ public class ManifestService
         _storageObjectRepository = storageObjectRepository;
     }
 
-    public async Task<Dictionary<Guid, ManifestFileReport>> GenerateComparisonReport(int userId, FileManifest fileManifest)
+    public async Task<List<ManifestFileReport>> GenerateComparisonReport(int userId, FileManifest fileManifest)
     {
         var storageObjectComparisonQueue = (await _storageObjectRepository
                 .FindAsync(x => x.OwnerId == userId && x.BucketId == fileManifest.BucketId))
             .OrderByDescending(x => x.UploadedDate)
             .ToList();
         
-        var manifestFileReports = new Dictionary<Guid, ManifestFileReport>();
+        var manifestFileReports = new List<ManifestFileReport>();
         var longestQueue = Math.Max(storageObjectComparisonQueue.Count, fileManifest.Entries.Count);
 
         for (var i = 0; i < longestQueue; i++)
         {
             var entry = fileManifest.Entries.ElementAtOrDefault(i);
             var storageObject = entry is not null
-                ? storageObjectComparisonQueue.FirstOrDefault(x => x.FileNameWithExtension == entry.FileName)
+                ? storageObjectComparisonQueue.FirstOrDefault(x => x.ClientRelativePath == entry.RelativePath)
                 : storageObjectComparisonQueue.FirstOrDefault();
             
             if(storageObject is not null)
                 storageObjectComparisonQueue.Remove(storageObject);
             
             var fileReport = CompareManifestEntry(entry, storageObject);
-            manifestFileReports.Add(entry?.Guid ?? Guid.Empty, fileReport);
+            manifestFileReports.Add(fileReport);
         }
         
         return manifestFileReports;
@@ -46,13 +46,14 @@ public class ManifestService
 
     private ManifestFileReport CompareManifestEntry(ManifestEntry? entry, StorageObject? storageObject)
     {
+        var crossReferenceId = entry?.Guid ?? Guid.Empty;
         // If the storage object does not exist then the client-side file must be new
         if (storageObject is null)
-            return new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.New, null);
+            return new ManifestFileReport(crossReferenceId, FileUploadState.UploadRequested, FileDiffState.New, null);
         
         // If the client-side entry does not exist then it must be either missing or deleted on the client
         if (entry is null)
-            return new ManifestFileReport(FileUploadState.DownloadAdvised, FileDiffState.Missing, storageObject);
+            return new ManifestFileReport(crossReferenceId, FileUploadState.DownloadAdvised, FileDiffState.Missing, storageObject);
             
         if (storageObject.IsDeleted)
         {
@@ -60,25 +61,25 @@ public class ManifestService
             {
                 // StorageObject.DeletedDate should NEVER be null if StorageObject.IsDeleted is true - what happened?
                 _logger.LogError("StorageObject.DeletedDate is null for StorageObject ID {StorageObjectId}", storageObject.Id);
-                return new ManifestFileReport(FileUploadState.Conflict, FileDiffState.Conflict, storageObject);
+                return new ManifestFileReport(crossReferenceId, FileUploadState.Conflict, FileDiffState.Conflict, storageObject);
             }
             
             return entry.LastModifiedDate.CompareTo(storageObject.DeletedDate) switch
             {
-                < 0 => new ManifestFileReport(FileUploadState.Ignore, FileDiffState.Removed, storageObject), // Last modified BEFORE the deleted date, no need to upload
-                > 0 => new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.Newer, storageObject), // Last modified AFTER the deleted date, client-side must be newer
-                _ => new ManifestFileReport(FileUploadState.Conflict, FileDiffState.Conflict, storageObject), // Removed at exactly the same time as it was updated - raise a conflict.
+                < 0 => new ManifestFileReport(crossReferenceId, FileUploadState.Ignore, FileDiffState.Removed, storageObject), // Last modified BEFORE the deleted date, no need to upload
+                > 0 => new ManifestFileReport(crossReferenceId, FileUploadState.UploadRequested, FileDiffState.Newer, storageObject), // Last modified AFTER the deleted date, client-side must be newer
+                _ => new ManifestFileReport(crossReferenceId, FileUploadState.Conflict, FileDiffState.Conflict, storageObject), // Removed at exactly the same time as it was updated - raise a conflict.
             };
         }
         
         if (entry.FileHash == storageObject.FileHash)
-            return new ManifestFileReport(FileUploadState.Ignore, FileDiffState.Same, storageObject);
+            return new ManifestFileReport(crossReferenceId, FileUploadState.Ignore, FileDiffState.Same, storageObject);
         
         return entry.LastModifiedDate.CompareTo(storageObject.LastModifiedDate) switch
         {
-            > 0 => new ManifestFileReport(FileUploadState.UploadRequested, FileDiffState.Newer, storageObject),
-            < 0 => new ManifestFileReport(FileUploadState.DownloadAdvised, FileDiffState.Older, storageObject),
-            _ => new ManifestFileReport(FileUploadState.Conflict, FileDiffState.Conflict, storageObject)
+            > 0 => new ManifestFileReport(crossReferenceId, FileUploadState.UploadRequested, FileDiffState.Newer, storageObject),
+            < 0 => new ManifestFileReport(crossReferenceId, FileUploadState.DownloadAdvised, FileDiffState.Older, storageObject),
+            _ => new ManifestFileReport(crossReferenceId, FileUploadState.Conflict, FileDiffState.Conflict, storageObject)
         };
     }
 }

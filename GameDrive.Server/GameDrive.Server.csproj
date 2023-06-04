@@ -24,6 +24,7 @@
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+      <Content Remove="storage\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,7 +32,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="storage\" />
+      <Compile Remove="storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="storage\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="storage\**" />
     </ItemGroup>
 
 </Project>

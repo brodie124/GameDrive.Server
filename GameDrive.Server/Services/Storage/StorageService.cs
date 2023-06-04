@@ -58,7 +58,7 @@ public class StorageService
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred whilst uploading file (\'{FileName}\')",
-                saveStorageObjectRequest.FileName);
+                saveStorageObjectRequest.GdFilePath);
             return null;
         }
     }

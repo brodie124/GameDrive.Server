@@ -4,6 +4,9 @@ namespace GameDrive.Server.Domain.Models;
 
 public class ManifestFileReport
 {
+    [JsonPropertyName("crossReferenceId")]
+    public Guid CrossReferenceId { get; set; }
+    
     [JsonPropertyName("uploadState")]
     public FileUploadState UploadState { get; set; }
     
@@ -15,6 +18,9 @@ public class ManifestFileReport
 
     [JsonPropertyName("storageObjectHash")]
     public string? StorageObjectHash { get; set; }
+    
+    [JsonPropertyName("clientRelativePath")]
+    public string? ClientRelativePath { get; set; }
 
     public ManifestFileReport()
     {
@@ -22,15 +28,18 @@ public class ManifestFileReport
     }
 
     public ManifestFileReport(
+        Guid crossReferenceId,
         FileUploadState uploadState, 
         FileDiffState diffState, 
         StorageObject? storageObject
     )
     {
+        CrossReferenceId = crossReferenceId;
         UploadState = uploadState;
         DiffState = diffState;
         StorageObjectId = storageObject?.Id;
         StorageObjectHash = storageObject?.FileHash;
+        ClientRelativePath = storageObject?.ClientRelativePath;
     }
 }
 

@@ -17,5 +17,19 @@ public static class GlobHelper
 
         return startingPath;
     }
+
+    public static string RemoveFileGlobalSuffix(string input)
+    {
+        var periodIndex = input.LastIndexOf('.');
+        var forwardSlashIndex = input.LastIndexOf('/');
+        var backSlashIndex = input.LastIndexOf('\\');
+        var slashPeak = Math.Max(forwardSlashIndex, backSlashIndex);
+        if (slashPeak >= periodIndex)
+            return input;
+
+        return slashPeak < 1 // Only substring if the length is greater than zero
+            ? input 
+            : input[..slashPeak];
+    }
     
 }

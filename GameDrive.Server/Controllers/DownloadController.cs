@@ -32,7 +32,7 @@ public class DownloadController : ControllerBase
         var stream = System.IO.File.OpenRead(storageObject.GameDrivePath);
         return new FileStreamResult(stream, MediaTypeNames.Application.Octet)
         {
-            FileDownloadName = storageObject.FileNameWithExtension
+            FileDownloadName = storageObject.ClientRelativePath
         };
     }
     

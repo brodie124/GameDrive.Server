@@ -20,7 +20,7 @@ public class ManifestController : ControllerBase
     }
     
     [HttpPost("Compare")]
-    public async Task<ApiResponse<Dictionary<Guid, ManifestFileReport>>> CompareManifestAsync([FromBody] FileManifest fileManifest)
+    public async Task<ApiResponse<List<ManifestFileReport>>> CompareManifestAsync([FromBody] FileManifest fileManifest)
     {
         var jwtData = Request.GetJwtDataFromRequest();
         var report = await _manifestService.GenerateComparisonReport(jwtData.UserId, fileManifest);

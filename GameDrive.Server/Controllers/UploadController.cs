@@ -26,7 +26,7 @@ public class UploadController : ControllerBase
     public async Task<ApiResponse<bool>> UploadFileAsync(
         [FromQuery] string bucketId, 
         [FromQuery] string bucketName,
-        [FromQuery] string fileNameWithExtension,
+        [FromQuery] string gdFilePath,
         [FromQuery] string fileHash,
         [FromQuery] DateTime fileCreatedDate,
         [FromQuery] DateTime fileLastModifiedDate,
@@ -39,12 +39,11 @@ public class UploadController : ControllerBase
         ).Value;
         
         var reader = new MultipartReader(boundary, Request.Body);
-        var fileName = Path.GetFileName(fileNameWithExtension); // File name with extension
         var result = await _storageService.UploadFileAsync(new SaveStorageObjectRequest(
             OwnerId: jwtData.UserId,
             BucketId: bucketId,
             BucketName: bucketName,
-            FileName: fileName,
+            GdFilePath: gdFilePath,
             FileHash: fileHash,
             FileCreatedDate: fileCreatedDate,
             FileLastModifiedDate: fileLastModifiedDate,
