@@ -37,16 +37,20 @@ public class ManifestService
             if(storageObject is not null)
                 storageObjectComparisonQueue.Remove(storageObject);
             
-            var fileReport = CompareManifestEntry(entry, storageObject);
+            var fileReport = await CompareManifestEntryAsync(entry, storageObject);
             manifestFileReports.Add(fileReport);
         }
         
         return manifestFileReports;
     }
 
-    private ManifestFileReport CompareManifestEntry(ManifestEntry? entry, StorageObject? storageObject)
+    private async Task<ManifestFileReport> CompareManifestEntryAsync(ManifestEntry? entry, StorageObject? storageObject)
     {
         var crossReferenceId = entry?.Guid ?? Guid.Empty;
+
+        if ((entry is null || entry.IsDeleted) && (storageObject is null || storageObject.IsDeleted))
+            return new ManifestFileReport(crossReferenceId, FileUploadState.Ignore, FileDiffState.Removed, null);
+        
         // If the storage object does not exist then the client-side file must be new
         if (storageObject is null)
             return new ManifestFileReport(crossReferenceId, FileUploadState.UploadRequested, FileDiffState.New, null);
@@ -70,6 +74,14 @@ public class ManifestService
                 > 0 => new ManifestFileReport(crossReferenceId, FileUploadState.UploadRequested, FileDiffState.Newer, storageObject), // Last modified AFTER the deleted date, client-side must be newer
                 _ => new ManifestFileReport(crossReferenceId, FileUploadState.Conflict, FileDiffState.Conflict, storageObject), // Removed at exactly the same time as it was updated - raise a conflict.
             };
+        }
+
+        if (entry.IsDeleted)
+        {
+            storageObject.IsDeleted = true;
+            storageObject.DeletedDate = DateTime.Now;
+            await _storageObjectRepository.UpdateAsync(storageObject);
+            return new ManifestFileReport(crossReferenceId, FileUploadState.Ignore, FileDiffState.Removed, null);
         }
         
         if (entry.FileHash == storageObject.FileHash)
