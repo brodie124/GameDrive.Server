@@ -31,7 +31,7 @@ public class StorageService
         {
             var bucket = (await _bucketRepository
                     .FindAsync(x => x.Id == saveStorageObjectRequest.BucketId))
-                    .FirstOrDefault();
+                .FirstOrDefault();
 
             if (bucket is null)
             {
@@ -48,9 +48,18 @@ public class StorageService
             if (!result.Success)
                 return null;
 
+            var existingStorageObject = (await _storageObjectRepository
+                    .FindAsync(x => x.BucketId == bucket.Id && x.ClientRelativePath == saveStorageObjectRequest.GdFilePath))
+                    .FirstOrDefault();
+            if (existingStorageObject is not null)
+            {
+                existingStorageObject.MarkForDeletion();
+                await _storageObjectRepository.RemoveAsync(existingStorageObject);
+            }
+
             var storageObject = result.StorageObject!;
             storageObject.BucketId = bucket.Id;
-            
+
             await _storageObjectRepository.AddAsync(storageObject);
             await _storageObjectRepository.SaveChangesAsync();
             return storageObject;
