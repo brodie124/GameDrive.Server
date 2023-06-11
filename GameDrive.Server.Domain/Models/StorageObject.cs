@@ -31,4 +31,10 @@ public class StorageObject
     
     [ForeignKey(nameof(BucketId))] 
     public Bucket Bucket { get; set; } = default!;
+
+    public void MarkForDeletion()
+    {
+        IsDeleted = true;
+        DeletedDate = DateTime.Now;
+    }
 }
