@@ -19,9 +19,13 @@ public class ManifestService
 
     public async Task<List<ManifestFileReport>> GenerateComparisonReport(int userId, FileManifest fileManifest)
     {
+        if (fileManifest.Entries.Count != fileManifest.Entries.DistinctBy(x => x.RelativePath).Count())
+            throw new InvalidDataException("File manifest cannot contain duplicated entries!");
+        
         var storageObjectComparisonQueue = (await _storageObjectRepository
                 .FindAsync(x => x.OwnerId == userId && x.BucketId == fileManifest.BucketId))
             .OrderByDescending(x => x.UploadedDate)
+            .DistinctBy(x => x.ClientRelativePath)
             .ToList();
         
         var manifestFileReports = new List<ManifestFileReport>();
@@ -78,8 +82,7 @@ public class ManifestService
 
         if (entry.IsDeleted)
         {
-            storageObject.IsDeleted = true;
-            storageObject.DeletedDate = DateTime.Now;
+            storageObject.MarkForDeletion();
             await _storageObjectRepository.UpdateAsync(storageObject);
             return new ManifestFileReport(crossReferenceId, FileUploadState.Ignore, FileDiffState.Removed, null);
         }
