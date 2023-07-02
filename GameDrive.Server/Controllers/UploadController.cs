@@ -47,7 +47,7 @@ public class UploadController : ControllerBase
             FileHash: fileHash,
             FileCreatedDate: fileCreatedDate,
             FileLastModifiedDate: fileLastModifiedDate,
-        MultipartReader: reader
+            MultipartReader: reader
         ), cancellationToken);
 
         if (result is null)
