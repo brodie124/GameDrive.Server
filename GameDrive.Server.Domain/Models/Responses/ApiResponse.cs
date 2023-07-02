@@ -36,7 +36,7 @@ public class ApiResponse<T>
     [JsonPropertyName("data")]
     public T? Data { get; set; }
 
-    protected ApiResponse()
+    public ApiResponse()
     {
         
     }

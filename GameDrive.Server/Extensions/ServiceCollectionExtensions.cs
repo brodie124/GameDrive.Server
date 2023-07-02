@@ -41,7 +41,6 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
     
-    // TODO: update this function to use values pulled from the configuration file
     public static IServiceCollection AddGameDriveAuthentication(this IServiceCollection serviceCollection, JwtOptions jwtOptions)
     {
         serviceCollection
