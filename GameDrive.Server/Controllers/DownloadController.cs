@@ -8,9 +8,9 @@ namespace GameDrive.Server.Controllers;
 [Route("[controller]")]
 public class DownloadController : ControllerBase
 {
-    private readonly StorageObjectRepository _storageObjectRepository;
+    private readonly IStorageObjectRepository _storageObjectRepository;
 
-    public DownloadController(StorageObjectRepository storageObjectRepository)
+    public DownloadController(IStorageObjectRepository storageObjectRepository)
     {
         _storageObjectRepository = storageObjectRepository;
     }

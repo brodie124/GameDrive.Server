@@ -6,11 +6,11 @@ namespace GameDrive.Server.Services;
 public class ManifestService
 {
     private readonly ILogger<ManifestService> _logger;
-    private readonly StorageObjectRepository _storageObjectRepository;
+    private readonly IStorageObjectRepository _storageObjectRepository;
 
     public ManifestService(
         ILogger<ManifestService> logger,
-        StorageObjectRepository storageObjectRepository
+        IStorageObjectRepository storageObjectRepository
     )
     {
         _logger = logger;

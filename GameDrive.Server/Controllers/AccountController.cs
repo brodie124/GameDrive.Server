@@ -13,11 +13,11 @@ namespace GameDrive.Server.Controllers;
 [Route("[controller]")]
 public class AccountController : ControllerBase
 {
-    private readonly UserRepository _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly AuthenticationService _authenticationService;
 
     public AccountController(
-        UserRepository userRepository,
+        IUserRepository userRepository,
         AuthenticationService authenticationService)
     {
         _userRepository = userRepository;

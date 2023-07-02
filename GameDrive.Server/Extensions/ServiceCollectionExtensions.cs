@@ -18,9 +18,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<StorageService>();
         serviceCollection.AddScoped<AuthenticationService>();
         serviceCollection.AddScoped<ManifestService>();
-        serviceCollection.AddScoped<StorageObjectRepository>();
-        serviceCollection.AddScoped<UserRepository>();
-        serviceCollection.AddScoped<BucketRepository>();
+        serviceCollection.AddScoped<IStorageObjectRepository, StorageObjectRepository>();
+        serviceCollection.AddScoped<IUserRepository, UserRepository>();
+        serviceCollection.AddScoped<IBucketRepository, BucketRepository>();
         serviceCollection.AddHostedService<MigrateDatabaseTask>();
         return serviceCollection;
     }

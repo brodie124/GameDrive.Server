@@ -8,14 +8,14 @@ public class StorageService
 {
     private readonly ILogger<StorageService> _logger;
     private readonly IStorageProvider _storageProvider;
-    private readonly StorageObjectRepository _storageObjectRepository;
-    private readonly BucketRepository _bucketRepository;
+    private readonly IStorageObjectRepository _storageObjectRepository;
+    private readonly IBucketRepository _bucketRepository;
 
     public StorageService(
         ILogger<StorageService> logger,
         IStorageProvider storageProvider,
-        StorageObjectRepository storageObjectRepository,
-        BucketRepository bucketRepository
+        IStorageObjectRepository storageObjectRepository,
+        IBucketRepository bucketRepository
     )
     {
         _logger = logger;
