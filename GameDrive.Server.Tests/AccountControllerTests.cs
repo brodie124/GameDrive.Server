@@ -5,27 +5,21 @@ using GameDrive.Server.Domain.Models.Responses;
 using GameDrive.Server.Domain.Models.TransferObjects;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 
 namespace GameDrive.Server.Tests;
 
 public class AccountControllerTests
 {
-    private readonly SqliteInMemoryDatabase _sqliteDatabase;
     private readonly HttpClient _httpClient;
 
     public AccountControllerTests()
     {
-        _sqliteDatabase = new SqliteInMemoryDatabase();
-        _sqliteDatabase.ResetAndRestart();
+        var sqliteDatabase = SqliteInMemoryDatabase.GetInstance();
+        sqliteDatabase.ResetAndRestart();
         
         var webHostBuilder = new WebHostBuilder()
-            .UseEnvironment("Development")
-            .UseConfiguration(new ConfigurationBuilder()
-                .AddJsonFile("appsettings.Development.json")
-                .Build()
-            )
-            .ConfigureTestServices(_sqliteDatabase.RegisterTestDbContext)
+            .UseDevelopmentConfiguration()
+            .UseTestSqliteInMemoryDatabase()
             .UseStartup<Startup>();
         
         var server = new TestServer(webHostBuilder);
