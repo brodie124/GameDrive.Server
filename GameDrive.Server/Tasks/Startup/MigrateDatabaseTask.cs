@@ -1,4 +1,4 @@
-using GameDrive.Server.Database;
+using GameDrive.Server.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameDrive.Server.Tasks.Startup;

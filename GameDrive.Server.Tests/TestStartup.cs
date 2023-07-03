@@ -1,4 +1,4 @@
-using GameDrive.Server.Database;
+using GameDrive.Server.Domain.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

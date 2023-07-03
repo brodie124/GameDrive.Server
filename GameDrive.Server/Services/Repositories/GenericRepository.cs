@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using GameDrive.Server.Database;
+using GameDrive.Server.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameDrive.Server.Services.Repositories;

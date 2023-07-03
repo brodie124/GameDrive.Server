@@ -1,11 +1,12 @@
 using System.Text;
-using GameDrive.Server.Database;
+using GameDrive.Server.Domain.Database;
 using GameDrive.Server.Models.Options;
 using GameDrive.Server.Services;
 using GameDrive.Server.Services.Repositories;
 using GameDrive.Server.Services.Storage;
 using GameDrive.Server.Tasks.Startup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GameDrive.Server.Extensions;
@@ -25,9 +26,30 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
     
-    public static IServiceCollection AddGameDriveDbContext(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddGameDriveDbContext(
+        this IServiceCollection serviceCollection, 
+        IConfiguration configuration,
+        DatabaseOptions databaseOptions
+    )
     {
-        serviceCollection.AddDbContext<GameDriveDbContext>();
+        serviceCollection.AddDbContext<GameDriveDbContext>(options =>
+        {
+            var provider = configuration.GetValue("provider", DatabaseProvider.Mysql.Name).ToLower();
+            if (provider == DatabaseProvider.Mysql.Name.ToLower()) {
+                var serverVersion = MySqlServerVersion.AutoDetect(databaseOptions.MysqlConnectionString);
+                options.UseMySql(databaseOptions.MysqlConnectionString, serverVersion,
+                    x => x.MigrationsAssembly(DatabaseProvider.Mysql.Assembly));
+            }
+            
+            if (provider == DatabaseProvider.Sqlite.Name.ToLower())
+            {
+                options.UseSqlite(
+                    databaseOptions.SqliteConnectionString,
+                    x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly)
+                );
+            }
+        });
+        
         return serviceCollection;
     }
     
@@ -66,3 +88,5 @@ public static class ServiceCollectionExtensions
     }
     
 }
+
+

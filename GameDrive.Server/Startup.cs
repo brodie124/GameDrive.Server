@@ -15,10 +15,11 @@ public class Startup
     public virtual void ConfigureServices(IServiceCollection services)
     {
         var jwtOptions = Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+        var databaseOptions = Configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>();
 
         // Add services to the container.
         services.AddGameDriveConfigurationOptions(Configuration);
-        services.AddGameDriveDbContext();
+        services.AddGameDriveDbContext(Configuration, databaseOptions);
         services.AddGameDriveServices();
         services.AddGameDriveAuthentication(jwtOptions);
         services.AddControllers();

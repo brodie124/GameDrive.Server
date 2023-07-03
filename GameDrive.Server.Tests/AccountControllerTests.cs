@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Reflection;
 using GameDrive.Server.Controllers;
-using GameDrive.Server.Database;
+using GameDrive.Server.Domain.Database;
 using GameDrive.Server.Domain.Models.Requests;
 using GameDrive.Server.Domain.Models.Responses;
 using GameDrive.Server.Domain.Models.TransferObjects;
@@ -23,50 +23,42 @@ namespace GameDrive.Server.Tests;
 
 public class AccountControllerTests
 {
-    private readonly SqliteInMemoryDatabase _sqliteMemoryDatabase;
-    private readonly GameDriveDbContext _gameDriveDatabaseContext;
-    private readonly JwtOptions _jwtOptions;
+    const string ConnectionString = "Data Source=GameDriveTestDb;Mode=Memory;Cache=Shared";
+    
+    // private readonly SqliteInMemoryDatabase _sqliteMemoryDatabase;
+    // private readonly GameDriveDbContext _gameDriveDatabaseContext;
     private readonly TestServer _server;
     private readonly HttpClient _httpClient;
+    private static SqliteConnection? _sqliteConnection;
 
     public AccountControllerTests()
     {
-        _sqliteMemoryDatabase = new SqliteInMemoryDatabase();
-        _gameDriveDatabaseContext = _sqliteMemoryDatabase.CreateContext();
-        _jwtOptions = new JwtOptions()
-        {
-            Key = "game-drive-test-key-1234-5678",
-            Audience = "game-drive-test-audience",
-            Issuer = "game-drive-test-issuer"
-        };
-
         var projectDir = GetProjectPath("", typeof(AccountControllerTests).GetTypeInfo().Assembly);
-
         var webHostBuilder = new WebHostBuilder()
             .UseEnvironment("Development")
             .UseContentRoot(projectDir)
-            .UseStartup<Startup>()
             .UseConfiguration(new ConfigurationBuilder()
-                // .SetBasePath(projectDir)
                 .AddJsonFile("appsettings.Development.json")
                 .Build()
             )
             .ConfigureTestServices(services =>
             {
-                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(GameDriveDbContext));
+                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<GameDriveDbContext>));
                 if (descriptor != null)
                     services.Remove(descriptor);
-
-                var connectionString = "DataSource=game-drive-test-db;mode=memory;cache=shared";
-                var connection = new SqliteConnection(connectionString);
-                connection.Open();
-
+                
+                _sqliteConnection = new SqliteConnection(ConnectionString);
+                _sqliteConnection.Open();
                 services.AddDbContext<GameDriveDbContext>(options =>
                 {
-                    options.UseSqlite(connectionString);
+                    options.UseSqlite(
+                        ConnectionString,
+                        x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly)
+                    );
                 });
 
-            });
+            })
+            .UseStartup<Startup>();
             
 
         _server = new TestServer(webHostBuilder);
@@ -77,26 +69,70 @@ public class AccountControllerTests
     public async void SignUp_WithValidData_ShouldReturnOK()
     {
         // Arrange
-        // var userRepository = new UserRepository(_gameDriveDatabaseContext);
-        // var authenticationService = new AuthenticationService(new OptionsWrapper<JwtOptions>(_jwtOptions));
-        // var sut = new AccountController(userRepository, authenticationService);
         var createUserRequest = new CreateUserRequest("test_user", "test_password");
 
         // Act
-        var test = await _httpClient.GetAsync("/Account/LogIn?username=test&passwordHash=1234");
-        var test2 = await _httpClient.GetAsync("/swagger/v1/swagger.json");
-        var test2Content = await test2.Content.ReadAsStringAsync();
-        
-        var healthResponse = await _httpClient.GetAsync("/Health");
-        
         var response = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
+
+        response.EnsureSuccessStatusCode();
         var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<UserDto>>();
 
+        // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        
         Assert.True(apiResponse?.IsSuccess);
         Assert.Equal("test_user", apiResponse?.Data?.Username);
     }
+    
+    
+    [Fact]
+    public async void SignUp_WithDuplicateUsername_ShouldReturnApiError()
+    {
+        // Arrange
+        var createUserRequest = new CreateUserRequest("test_user", "test_password");
+
+        // Act
+        var responseOne = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
+        var responseTwo = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
+
+        responseOne.EnsureSuccessStatusCode();
+        responseTwo.EnsureSuccessStatusCode();
+        
+        var apiResponseOne = await responseOne.Content.ReadFromJsonAsync<ApiResponse<UserDto>>();
+        var apiResponseTwo = await responseTwo.Content.ReadFromJsonAsync<ApiResponse<UserDto>>();
+
+        // Assert
+        Assert.True(apiResponseOne?.IsSuccess);
+        Assert.False(apiResponseTwo?.IsSuccess);
+        Assert.Equal("test_user", apiResponseOne?.Data?.Username);
+        Assert.Equal(ApiResponseCode.AuthUsernameTaken, apiResponseTwo?.ResponseCode);
+    }
+    
+    [Fact]
+    public async void LogIn_WithValidData_ShouldReturnOK()
+    {
+        // Arrange
+        const string username = "test_user";
+        const string password = "test_password";
+        var createUserRequest = new CreateUserRequest(username, password);
+
+        // Act
+        var signUpResponse = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
+        var logInResponse = await _httpClient.PostAsJsonAsync($"Account/LogIn?username={username}&passwordHash={password}", string.Empty);
+
+        signUpResponse.EnsureSuccessStatusCode();
+        logInResponse.EnsureSuccessStatusCode();
+        
+        var signUpDto = await signUpResponse.Content.ReadFromJsonAsync<ApiResponse<UserDto>>();
+        var logInDto = await logInResponse.Content.ReadFromJsonAsync<ApiResponse<string>>();
+
+        // Assert
+        Assert.True(signUpDto?.IsSuccess);
+        Assert.True(logInDto?.IsSuccess);
+        Assert.NotNull(logInDto?.Data);
+        Assert.True(logInDto?.Data?.Length > 0);
+    }
+    
+    
     
     private static string GetProjectPath(string projectRelativePath, Assembly startupAssembly)
     {

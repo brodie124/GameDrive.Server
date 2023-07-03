@@ -1,4 +1,4 @@
-using GameDrive.Server.Database;
+using GameDrive.Server.Domain.Database;
 using GameDrive.Server.Models.Options;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -29,10 +29,6 @@ public class SqliteInMemoryDatabase : IDisposable
 public class GameDriveTestDbContext : GameDriveDbContext
 {
     public GameDriveTestDbContext(DbContextOptions options) : base(options)
-    {
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
     }
 }
