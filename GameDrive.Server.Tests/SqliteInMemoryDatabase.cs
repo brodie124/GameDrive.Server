@@ -2,27 +2,36 @@ using GameDrive.Server.Domain.Database;
 using GameDrive.Server.Models.Options;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace GameDrive.Server.Tests;
 
 public class SqliteInMemoryDatabase : IDisposable
 {
-    private readonly SqliteConnection _connection;
-    private readonly DbContextOptions<GameDriveDbContext> _contextOptions;
+    private const string ConnectionString = "Data Source=GameDriveTestDb;Mode=Memory;Cache=Shared";
+    private static readonly SqliteConnection Connection = new SqliteConnection(ConnectionString);
 
-    public SqliteInMemoryDatabase()
+    public void ResetAndRestart()
     {
-        _connection = new SqliteConnection("Filename=:memory:");
-        _connection.Open();
-
-        _contextOptions = new DbContextOptionsBuilder<GameDriveDbContext>()
-            .UseSqlite(_connection)
-            .Options;
+        Connection.Close();
+        Connection.Open();
     }
 
-    public GameDriveDbContext CreateContext() => new GameDriveTestDbContext(_contextOptions);
-    public void Dispose() => _connection.Dispose();
+    public void RegisterTestDbContext(IServiceCollection services)
+    {
+        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<GameDriveDbContext>));
+        if (descriptor != null)
+            services.Remove(descriptor);
+        
+        services.AddDbContext<GameDriveDbContext>(options =>
+        {
+            options.UseSqlite(ConnectionString, x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly));    
+        });
+        
+    }
+    
+    public void Dispose() => Connection.Dispose();
     
 }
 

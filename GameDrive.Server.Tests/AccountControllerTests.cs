@@ -1,68 +1,40 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Reflection;
-using GameDrive.Server.Controllers;
 using GameDrive.Server.Domain.Database;
 using GameDrive.Server.Domain.Models.Requests;
 using GameDrive.Server.Domain.Models.Responses;
 using GameDrive.Server.Domain.Models.TransferObjects;
-using GameDrive.Server.Models.Options;
-using GameDrive.Server.Services;
-using GameDrive.Server.Services.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace GameDrive.Server.Tests;
 
 public class AccountControllerTests
 {
-    const string ConnectionString = "Data Source=GameDriveTestDb;Mode=Memory;Cache=Shared";
-    
-    // private readonly SqliteInMemoryDatabase _sqliteMemoryDatabase;
-    // private readonly GameDriveDbContext _gameDriveDatabaseContext;
-    private readonly TestServer _server;
+    private readonly SqliteInMemoryDatabase _sqliteDatabase;
     private readonly HttpClient _httpClient;
-    private static SqliteConnection? _sqliteConnection;
 
     public AccountControllerTests()
     {
-        var projectDir = GetProjectPath("", typeof(AccountControllerTests).GetTypeInfo().Assembly);
+        _sqliteDatabase = new SqliteInMemoryDatabase();
+        _sqliteDatabase.ResetAndRestart();
+        
         var webHostBuilder = new WebHostBuilder()
             .UseEnvironment("Development")
-            .UseContentRoot(projectDir)
             .UseConfiguration(new ConfigurationBuilder()
                 .AddJsonFile("appsettings.Development.json")
                 .Build()
             )
-            .ConfigureTestServices(services =>
-            {
-                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<GameDriveDbContext>));
-                if (descriptor != null)
-                    services.Remove(descriptor);
-                
-                _sqliteConnection = new SqliteConnection(ConnectionString);
-                _sqliteConnection.Open();
-                services.AddDbContext<GameDriveDbContext>(options =>
-                {
-                    options.UseSqlite(
-                        ConnectionString,
-                        x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly)
-                    );
-                });
-
-            })
+            .ConfigureTestServices(_sqliteDatabase.RegisterTestDbContext)
             .UseStartup<Startup>();
-            
-
-        _server = new TestServer(webHostBuilder);
-        _httpClient = _server.CreateClient();
+        
+        var server = new TestServer(webHostBuilder);
+        _httpClient = server.CreateClient();
     }
     
     [Fact]
@@ -130,36 +102,5 @@ public class AccountControllerTests
         Assert.True(logInDto?.IsSuccess);
         Assert.NotNull(logInDto?.Data);
         Assert.True(logInDto?.Data?.Length > 0);
-    }
-    
-    
-    
-    private static string GetProjectPath(string projectRelativePath, Assembly startupAssembly)
-    {
-        // Get name of the target project which we want to test
-        var projectName = startupAssembly.GetName().Name;
-
-        // Get currently executing test project path
-        var applicationBasePath = System.AppContext.BaseDirectory;
-
-        // Find the path to the target project
-        var directoryInfo = new DirectoryInfo(applicationBasePath);
-        do
-        {
-            directoryInfo = directoryInfo.Parent;
-
-            var projectDirectoryInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, projectRelativePath));
-            if (projectDirectoryInfo.Exists)
-            {
-                var projectFileInfo = new FileInfo(Path.Combine(projectDirectoryInfo.FullName, projectName, $"{projectName}.csproj"));
-                if (projectFileInfo.Exists)
-                {
-                    return Path.Combine(projectDirectoryInfo.FullName, projectName);
-                }
-            }
-        }
-        while (directoryInfo.Parent != null);
-
-        throw new Exception($"Project root could not be located using the application root {applicationBasePath}.");
     }
 }
