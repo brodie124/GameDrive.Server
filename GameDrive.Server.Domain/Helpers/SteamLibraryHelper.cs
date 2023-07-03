@@ -1,4 +1,3 @@
-using System.IO;
 using Gameloop.Vdf;
 using Microsoft.CSharp.RuntimeBinder;
 

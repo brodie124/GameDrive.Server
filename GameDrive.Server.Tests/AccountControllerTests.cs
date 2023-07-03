@@ -1,16 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Reflection;
-using GameDrive.Server.Domain.Database;
 using GameDrive.Server.Domain.Models.Requests;
 using GameDrive.Server.Domain.Models.Responses;
 using GameDrive.Server.Domain.Models.TransferObjects;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GameDrive.Server.Tests;
 
@@ -45,8 +40,8 @@ public class AccountControllerTests
 
         // Act
         var response = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
-
         response.EnsureSuccessStatusCode();
+        
         var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<UserDto>>();
 
         // Assert
@@ -65,7 +60,6 @@ public class AccountControllerTests
         // Act
         var responseOne = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
         var responseTwo = await _httpClient.PostAsJsonAsync("Account/SignUp", createUserRequest);
-
         responseOne.EnsureSuccessStatusCode();
         responseTwo.EnsureSuccessStatusCode();
         

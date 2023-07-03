@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using GameDrive.Server.Domain.Models.TransferObjects;
 using GameDrive.Server.Models;
 using GameDrive.Server.Models.Options;
 using Microsoft.Extensions.Options;

@@ -1,6 +1,4 @@
 using GameDrive.Server;
-using GameDrive.Server.Extensions;
-using GameDrive.Server.Models.Options;
 using Microsoft.AspNetCore;
 
 public class Program

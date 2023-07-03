@@ -1,9 +1,7 @@
 using GameDrive.Server.Domain.Database;
-using GameDrive.Server.Models.Options;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace GameDrive.Server.Tests;
 
