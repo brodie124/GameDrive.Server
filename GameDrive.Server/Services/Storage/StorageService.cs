@@ -23,8 +23,10 @@ public class StorageService
         _bucketRepository = bucketRepository;
     }
 
-    public async Task<StorageObject?> UploadFileAsync(SaveStorageObjectRequest saveStorageObjectRequest,
-        CancellationToken cancellationToken = default)
+    public async Task<StorageObject?> UploadFileAsync(
+        SaveStorageObjectRequest saveStorageObjectRequest,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
