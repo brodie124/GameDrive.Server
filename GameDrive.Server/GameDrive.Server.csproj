@@ -49,9 +49,4 @@
       <None Remove="storage\**" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Migrations\" />
-      <Folder Include="Migrations\SqliteMigrations\" />
-    </ItemGroup>
-
 </Project>
