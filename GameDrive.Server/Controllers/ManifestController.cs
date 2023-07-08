@@ -1,5 +1,6 @@
-using GameDrive.Server.Domain.Models;
+using GameDrive.Server.Domain.Models.Requests;
 using GameDrive.Server.Domain.Models.Responses;
+using GameDrive.Server.Domain.Models.TransferObjects;
 using GameDrive.Server.Extensions;
 using GameDrive.Server.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +21,11 @@ public class ManifestController : ControllerBase
     }
     
     [HttpPost("Compare")]
-    public async Task<ApiResponse<List<CompareManifestResult>>> CompareManifestAsync([FromBody] FileManifest fileManifest)
+    public async Task<ApiResponse<CompareManifestResponse>> CompareManifestAsync([FromBody] CompareManifestRequest compareManifestRequest)
     {
         var jwtData = Request.GetJwtDataFromRequest();
-        var report = await _manifestService.GenerateComparisonReport(jwtData.UserId, fileManifest);
+        var manifest = compareManifestRequest.Manifest.ToGameProfileManifest();
+        var report = await _manifestService.GenerateComparisonReport(jwtData.UserId, manifest);
         return report;
     }
 }

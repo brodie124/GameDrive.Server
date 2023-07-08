@@ -1,8 +1,18 @@
 using System.Text.Json.Serialization;
 
-namespace GameDrive.Server.Domain.Models;
+namespace GameDrive.Server.Domain.Models.Responses;
 
-public class CompareManifestResult
+public class CompareManifestResponse
+{
+    public List<CompareManifestResponseEntry> Entries { get; set; }
+
+    public CompareManifestResponse(List<CompareManifestResponseEntry> entries)
+    {
+        Entries = entries;
+    }
+}
+
+public class CompareManifestResponseEntry
 {
     [JsonPropertyName("crossReferenceId")]
     public Guid CrossReferenceId { get; set; }
@@ -22,12 +32,12 @@ public class CompareManifestResult
     [JsonPropertyName("clientRelativePath")]
     public string? ClientRelativePath { get; set; }
 
-    public CompareManifestResult()
+    public CompareManifestResponseEntry()
     {
         
     }
 
-    public CompareManifestResult(
+    public CompareManifestResponseEntry(
         Guid crossReferenceId,
         FileUploadState uploadState,
         FileDiffState diffState
@@ -38,7 +48,7 @@ public class CompareManifestResult
         DiffState = diffState;
     }
 
-    public CompareManifestResult WithStorageObject(StorageObject? storageObject)
+    public CompareManifestResponseEntry WithStorageObject(StorageObject? storageObject)
     {
         StorageObjectId = storageObject?.Id;
         StorageObjectHash = storageObject?.FileHash;
@@ -46,7 +56,7 @@ public class CompareManifestResult
         return this;
     }
 
-    public CompareManifestResult WithEntry(ManifestEntry? manifestEntry)
+    public CompareManifestResponseEntry WithEntry(ManifestEntry? manifestEntry)
     {
         ClientRelativePath = manifestEntry?.RelativePath;
         return this;

@@ -1,8 +1,8 @@
 namespace GameDrive.Server.Domain.Models;
 
-public class FileManifest
+public class GameProfileManifest
 {
-    public string BucketId { get; set; }
+    public string GameProfileId { get; set; }
     public IReadOnlyCollection<ManifestEntry> Entries { get; set; }
 }
 

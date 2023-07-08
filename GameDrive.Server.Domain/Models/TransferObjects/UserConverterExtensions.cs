@@ -1,6 +1,6 @@
 namespace GameDrive.Server.Domain.Models.TransferObjects;
 
-public static class UserConverter
+public static class UserConverterExtensions
 {
     public static UserDto ToDto(this User user)
     {
