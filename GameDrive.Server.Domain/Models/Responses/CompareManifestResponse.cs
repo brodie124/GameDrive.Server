@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
+using GameDrive.Server.Domain.Enums;
 
 namespace GameDrive.Server.Domain.Models.Responses;
 
 public class CompareManifestResponse
 {
+    [JsonPropertyName("entries")]
     public List<CompareManifestResponseEntry> Entries { get; set; }
 
     public CompareManifestResponse(List<CompareManifestResponseEntry> entries)
@@ -22,7 +24,10 @@ public class CompareManifestResponseEntry
     
     [JsonPropertyName("diffState")]
     public  FileDiffState DiffState { get; set; }
-    
+
+    [JsonPropertyName("clientAcceptedStatus")]
+    public FileAcceptedStatus ClientAcceptedStatus { get; set; }
+
     [JsonPropertyName("storageObjectId")]
     public Guid? StorageObjectId { get; set; }
 
