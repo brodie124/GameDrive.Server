@@ -29,18 +29,29 @@ public class ManifestFileReport
 
     public ManifestFileReport(
         Guid crossReferenceId,
-        FileUploadState uploadState, 
-        FileDiffState diffState, 
-        StorageObject? storageObject
+        FileUploadState uploadState,
+        FileDiffState diffState
     )
     {
         CrossReferenceId = crossReferenceId;
         UploadState = uploadState;
         DiffState = diffState;
+    }
+
+    public ManifestFileReport WithStorageObject(StorageObject? storageObject)
+    {
         StorageObjectId = storageObject?.Id;
         StorageObjectHash = storageObject?.FileHash;
         ClientRelativePath = storageObject?.ClientRelativePath;
+        return this;
     }
+
+    public ManifestFileReport WithEntry(ManifestEntry? manifestEntry)
+    {
+        ClientRelativePath = manifestEntry?.RelativePath;
+        return this;
+    }
+
 }
 
 public enum FileUploadState
