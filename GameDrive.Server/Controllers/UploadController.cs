@@ -21,6 +21,7 @@ public class UploadController : ControllerBase
         _storageService = storageService;
     }
 
+    // FIXME: lower the number of parameters for this function
     [HttpPost]
     [DisableFormValueModelBinding]
     public async Task<ApiResponse<bool>> UploadFileAsync(
