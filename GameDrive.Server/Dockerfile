@@ -5,7 +5,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["GameDrive.Server/GameDrive.Server.csproj", "GameDrive.Server/"]
+COPY ["GameDrive.Server.csproj", "GameDrive.Server/"]
 RUN dotnet restore "GameDrive.Server/GameDrive.Server.csproj"
 COPY . .
 WORKDIR "/src/GameDrive.Server"
