@@ -1,3 +1,4 @@
+using System.Reflection;
 using GameDrive.Server.Domain.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +10,10 @@ public class HealthController : ControllerBase
 {
 
     [HttpGet]
-    public ApiResponse<string> GetHealthCheck()
+    public ApiResponse<HealthCheckResponse> GetHealthCheck()
     {
-        return "Healthy";
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+        return new HealthCheckResponse(true, version);
     }
     
 }
