@@ -1,5 +1,6 @@
 using System.Net.Mime;
 using GameDrive.Server.Services.Repositories;
+using GameDrive.Server.Services.Storage;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameDrive.Server.Controllers;
@@ -9,17 +10,39 @@ namespace GameDrive.Server.Controllers;
 public class DownloadController : ControllerBase
 {
     private readonly IStorageObjectRepository _storageObjectRepository;
+    private readonly IStorageProvider _storageProvider;
 
-    public DownloadController(IStorageObjectRepository storageObjectRepository)
+    public DownloadController(
+        IStorageObjectRepository storageObjectRepository,
+        IStorageProvider storageProvider
+    )
     {
         _storageObjectRepository = storageObjectRepository;
+        _storageProvider = storageProvider;
     }
 
     [HttpGet("{storageObjectId}")]
     public async Task<ActionResult> DownloadStorageObjectAsync(Guid storageObjectId)
     {
         var storageObject = (await _storageObjectRepository
-            .FindAsync(x => x.Id == storageObjectId))
+                .FindAsync(x => x.Id == storageObjectId))
+            .FirstOrDefault();
+
+        if (storageObject is null)
+            return NotFound();
+
+        var downloadLink = await _storageProvider.GenerateDownloadLinkAsync(storageObject);
+        if (!downloadLink.Success || string.IsNullOrWhiteSpace(downloadLink.DownloadUrl))
+            return UnprocessableEntity();
+        
+        return Redirect(downloadLink.DownloadUrl);
+    }
+    
+    [HttpGet("Local/{storageObjectId}")]
+    public async Task<ActionResult> DownloadLocalStorageObjectAsync(Guid storageObjectId)
+    {
+        var storageObject = (await _storageObjectRepository
+                .FindAsync(x => x.Id == storageObjectId))
             .FirstOrDefault();
 
         if (storageObject is null)
@@ -35,5 +58,4 @@ public class DownloadController : ControllerBase
             FileDownloadName = storageObject.ClientRelativePath
         };
     }
-    
 }
