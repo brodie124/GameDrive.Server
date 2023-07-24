@@ -1,11 +1,19 @@
 using GameDrive.Server.Domain.Models;
-using GameDrive.Server.Utilities;
-using Microsoft.Net.Http.Headers;
+using GameDrive.Server.Models.Options;
+using Microsoft.Extensions.Options;
 
 namespace GameDrive.Server.Services.Storage;
 
 public class LocalStorageProvider : IStorageProvider
 {
+    private readonly TemporaryStorageOptions _temporaryStorageOptions;
+
+    public LocalStorageProvider(
+        IOptions<TemporaryStorageOptions> temporaryStorageOptions)
+    {
+        _temporaryStorageOptions = temporaryStorageOptions.Value;
+    }
+    
     public async Task<SaveStorageObjectResult> SaveObjectAsync(SaveStorageObjectRequest saveRequest, CancellationToken cancellationToken = default)
     {
         // TODO: do this on application startup rather than every time a file is saved...
@@ -32,20 +40,8 @@ public class LocalStorageProvider : IStorageProvider
 
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
         var writeStream = new StreamWriter(filePath);
-        
-        var section = await saveRequest.MultipartReader.ReadNextSectionAsync(cancellationToken);
-        while (section is not null)
-        {
-            if (!ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var contentDisposition))
-                continue;
+        await saveRequest.SourceStream.CopyToAsync(writeStream.BaseStream, cancellationToken);
 
-            if (!MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
-                continue;
-            
-            await section.Body.CopyToAsync(writeStream.BaseStream, cancellationToken);
-            section = await saveRequest.MultipartReader.ReadNextSectionAsync(cancellationToken);
-        }
-        
         var fileSize = writeStream.BaseStream.Position;
         await writeStream.FlushAsync();
         writeStream.Close();

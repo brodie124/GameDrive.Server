@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGameDriveServices(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddScoped<TemporaryStorageProvider>();
         serviceCollection.AddScoped<IStorageProvider, LocalStorageProvider>();
         serviceCollection.AddScoped<StorageService>();
         serviceCollection.AddScoped<AuthenticationService>();
@@ -60,6 +61,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
         serviceCollection.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        serviceCollection.Configure<TemporaryStorageOptions>(configuration.GetSection(TemporaryStorageOptions.SectionName));
         return serviceCollection;
     }
     

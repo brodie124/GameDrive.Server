@@ -1,5 +1,4 @@
 using GameDrive.Server.Domain.Models;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace GameDrive.Server.Services.Storage;
 
@@ -32,5 +31,5 @@ public record SaveStorageObjectRequest(
     string FileHash,
     DateTime FileCreatedDate,
     DateTime FileLastModifiedDate,
-    MultipartReader MultipartReader
+    Stream SourceStream
 );
