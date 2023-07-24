@@ -14,10 +14,15 @@ namespace GameDrive.Server.Controllers;
 [Route("[controller]")]
 public class UploadController : ControllerBase
 {
+    private readonly IWebHostEnvironment _hostEnvironment;
     private readonly StorageService _storageService;
 
-    public UploadController(StorageService storageService)
+    public UploadController(
+        IWebHostEnvironment hostEnvironment,
+        StorageService storageService
+        )
     {
+        _hostEnvironment = hostEnvironment;
         _storageService = storageService;
     }
 
@@ -34,6 +39,9 @@ public class UploadController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
+        if(_hostEnvironment.IsProduction())
+            return ApiResponse<bool>.Failure("This feature is currently under development.");
+        
         var jwtData = Request.GetJwtDataFromRequest();
         var boundary = HeaderUtilities.RemoveQuotes(
             MediaTypeHeaderValue.Parse(Request.ContentType).Boundary
