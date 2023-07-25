@@ -25,6 +25,7 @@ public class StorageService
 
     public async Task<StorageObject?> UploadFileAsync(
         SaveStorageObjectRequest saveStorageObjectRequest,
+        bool saveChanges = true, // TODO: Revisit this way of delaying saving
         CancellationToken cancellationToken = default
     )
     {
@@ -62,7 +63,10 @@ public class StorageService
             storageObject.BucketId = bucket.Id;
 
             await _storageObjectRepository.AddAsync(storageObject);
-            await _storageObjectRepository.SaveChangesAsync();
+            
+            if(saveChanges)
+                await _storageObjectRepository.SaveChangesAsync();
+            
             return storageObject;
         }
         catch (Exception ex)
