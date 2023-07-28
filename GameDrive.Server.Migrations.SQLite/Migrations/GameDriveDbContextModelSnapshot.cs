@@ -71,6 +71,9 @@ namespace GameDrive.Server.Migrations.SQLite.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid?>("TemporaryFileKey")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("UploadedDate")
                         .HasColumnType("TEXT");
 

@@ -92,14 +92,12 @@ public class UploadController : ControllerBase
 
         if (temporaryFiles.Count == 0)
             return ApiResponse<bool>.Failure("No files were successfully uploaded");
-
-        var count = 0;
+        
+        var saveRequests = new List<SaveStorageObjectRequest>();
         foreach (var (multiPartName, temporaryFileKey) in temporaryFiles)
         {
             var uploadFileRequest = uploadFileRequests.First(x => x.MultiPartName == multiPartName);
-            await using var tempFileStream = _temporaryStorageProvider.GetFile(temporaryFileKey);
-            var isLastFile = count >= temporaryFiles.Count - 1;
-            var result = await _storageService.UploadFileAsync(new SaveStorageObjectRequest(
+            var saveStorageObjectRequest = new SaveStorageObjectRequest(
                 OwnerId: jwtData.UserId,
                 BucketId: uploadFileRequest.BucketId,
                 BucketName: uploadFileRequest.BucketName,
@@ -107,13 +105,13 @@ public class UploadController : ControllerBase
                 FileHash: uploadFileRequest.FileHash,
                 FileCreatedDate: uploadFileRequest.FileCreatedDate,
                 FileLastModifiedDate: uploadFileRequest.FileLastModifiedDate,
-                SourceStream: tempFileStream
-            ), isLastFile, cancellationToken);
-            count++;
-
-            if (result is null)
-                return ApiResponse<bool>.Failure("An error occurred whilst uploading one of the files");
+                TemporaryFileKey: temporaryFileKey
+            );
+            
+            saveRequests.Add(saveStorageObjectRequest);
         }
+
+        await _storageService.SaveFilesAsync(saveRequests, cancellationToken);
         return true;
     }
 }

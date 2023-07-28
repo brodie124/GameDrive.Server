@@ -23,6 +23,11 @@ public class StorageObject
    
     public string GameDrivePath { get; set; } = default!;
 
+    public Guid? TemporaryFileKey { get; set; } = null;
+
+    [NotMapped]
+    public bool RequiresReplication => TemporaryFileKey is not null;
+
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedDate { get; set; }
 

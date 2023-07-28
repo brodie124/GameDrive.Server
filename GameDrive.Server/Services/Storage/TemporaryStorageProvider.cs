@@ -26,7 +26,10 @@ public class TemporaryStorageProvider
         await using var writeStream = new StreamWriter(filePath);
         await source.CopyToAsync(writeStream.BaseStream);
         await writeStream.FlushAsync();
-        return new SaveFileResult(key);
+        return new SaveFileResult(
+            Key: key,
+            Hash: string.Empty
+        );
     }
     
     public Stream GetFile(Guid key)
@@ -40,12 +43,19 @@ public class TemporaryStorageProvider
         return readStream.BaseStream;
     }
 
+    public Task<bool> HasFileAsync(Guid key)
+    {
+        var path = MakeTemporaryPath(key);
+        return Task.FromResult(File.Exists(path));
+    }
+
     private string MakeTemporaryPath(Guid key)
     {
         return Path.Combine(_temporaryStorageOptions.TemporaryStoragePath, $"{key.ToString()}.blob");
     } 
 
     public record SaveFileResult(
-        Guid Key
+        Guid Key,
+        string Hash
     );
 }

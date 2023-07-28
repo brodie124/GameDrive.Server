@@ -7,8 +7,17 @@ namespace GameDrive.Server.Services.Storage;
 
 public class LocalCloudStorageProvider : ICloudStorageProvider
 {
-    public async Task<Result<IReadOnlyList<StorageObject>>> SaveObjectsAsync(
-        IEnumerable<SaveStorageObjectRequest> saveRequests, 
+    private readonly TemporaryStorageProvider _temporaryStorageProvider;
+
+    public LocalCloudStorageProvider(
+        TemporaryStorageProvider temporaryStorageProvider
+    )
+    {
+        _temporaryStorageProvider = temporaryStorageProvider;
+    }
+
+    public async Task<Result> SaveObjectsAsync(
+        IEnumerable<StorageObject> storageObjects,
         CancellationToken cancellationToken = default
     )
     {
@@ -16,45 +25,21 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
         if (!Directory.Exists("storage"))
             Directory.CreateDirectory("storage");
 
-        var storageObjects = new List<StorageObject>();
-        foreach (var request in saveRequests)
+        foreach (var storageObject in storageObjects.ToList())
         {
-
-            var storageId = Guid.NewGuid(); // Create a new GUID so that we can use it to generate the GameDrivePath
-            var storageObject = new StorageObject()
-            {
-                Id = storageId,
-                OwnerId = request.OwnerId,
-                BucketId = request.BucketId,
-
-                FileSizeBytes = 0,
-                FileHash = "",
-
-                ClientRelativePath = request.GdFilePath,
-
-                UploadedDate = DateTime.Now,
-                CreatedDate = request.FileCreatedDate,
-                LastModifiedDate = request.FileLastModifiedDate,
-
-                GameDrivePath = Path.Combine("storage", $"{storageId.ToString().Replace("-", "")}.blob"),
-            };
+            if (storageObject.TemporaryFileKey is null)
+                throw new InvalidOperationException("Upload called for object that has already been replicated");
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
-            var writeStream = new StreamWriter(filePath);
-            await request.SourceStream.CopyToAsync(writeStream.BaseStream, cancellationToken);
+            await using var writeStream = new StreamWriter(filePath);
+            await using var temporaryFileStream =
+                _temporaryStorageProvider.GetFile((Guid)storageObject.TemporaryFileKey);
 
-            var fileSize = writeStream.BaseStream.Position;
+            await temporaryFileStream.CopyToAsync(writeStream.BaseStream, cancellationToken);
             await writeStream.FlushAsync();
-            writeStream.Close();
-
-            storageObject.FileSizeBytes = fileSize;
-            storageObject.FileHash =
-                request.FileHash; // TODO: change this so that we compare the hash provided with a calculated hash on the uploaded file to verify integrity
-
-            storageObjects.Add(storageObject);
         }
 
-        return storageObjects;
+        return Result.Success();
     }
 
     public Task<Result<string>> GenerateDownloadLinkAsync(StorageObject storageObject)
