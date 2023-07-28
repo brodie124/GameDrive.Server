@@ -7,14 +7,6 @@ namespace GameDrive.Server.Services.Storage;
 
 public class LocalCloudStorageProvider : ICloudStorageProvider
 {
-    private readonly TemporaryStorageOptions _temporaryStorageOptions;
-
-    public LocalCloudStorageProvider(
-        IOptions<TemporaryStorageOptions> temporaryStorageOptions)
-    {
-        _temporaryStorageOptions = temporaryStorageOptions.Value;
-    }
-    
     public async Task<Result<IReadOnlyList<StorageObject>>> SaveObjectsAsync(
         IEnumerable<SaveStorageObjectRequest> saveRequests, 
         CancellationToken cancellationToken = default
