@@ -46,8 +46,8 @@ public class StorageService
                 await _bucketRepository.AddAsync(bucket);
             }
 
-            var result = await _cloudStorageProvider.SaveObjectAsync(saveStorageObjectRequest, cancellationToken);
-            if (!result.Success)
+            var result = await _cloudStorageProvider.SaveObjectsAsync(new[] { saveStorageObjectRequest }, cancellationToken);
+            if (result.IsFailure)
                 return null;
 
             var existingStorageObject = (await _storageObjectRepository
@@ -59,7 +59,7 @@ public class StorageService
                 await _storageObjectRepository.RemoveAsync(existingStorageObject);
             }
 
-            var storageObject = result.StorageObject!;
+            var storageObject = result.Value[0];
             storageObject.BucketId = bucket.Id;
 
             await _storageObjectRepository.AddAsync(storageObject);

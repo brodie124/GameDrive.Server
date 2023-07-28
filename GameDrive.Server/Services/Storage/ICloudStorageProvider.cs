@@ -1,27 +1,14 @@
+using CSharpFunctionalExtensions;
 using GameDrive.Server.Domain.Models;
 
 namespace GameDrive.Server.Services.Storage;
 
 public interface ICloudStorageProvider
 {
-    Task<SaveStorageObjectResult> SaveObjectAsync(SaveStorageObjectRequest saveRequest, CancellationToken cancellationToken = default);
-    Task<DownloadStorageObjectResult> GenerateDownloadLinkAsync(StorageObject storageObject);
-    Task<DeleteStorageObjectResult> DeleteObjectAsync(StorageObject storageObject);
+    Task<Result<IReadOnlyList<StorageObject>>> SaveObjectsAsync(IEnumerable<SaveStorageObjectRequest> request, CancellationToken cancellationToken = default);
+    Task<Result<string>> GenerateDownloadLinkAsync(StorageObject storageObject);
+    Task<Result> DeleteObjectAsync(StorageObject storageObject);
 }
-
-public record SaveStorageObjectResult(
-    bool Success,
-    StorageObject? StorageObject
-);
-
-public record DeleteStorageObjectResult(
-    bool Success
-);
-
-public record DownloadStorageObjectResult(
-    bool Success,
-    string DownloadUrl
-);
 
 public record SaveStorageObjectRequest(
     int OwnerId,

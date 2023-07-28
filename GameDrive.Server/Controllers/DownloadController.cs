@@ -31,11 +31,11 @@ public class DownloadController : ControllerBase
         if (storageObject is null)
             return NotFound();
 
-        var downloadLink = await _cloudStorageProvider.GenerateDownloadLinkAsync(storageObject);
-        if (!downloadLink.Success || string.IsNullOrWhiteSpace(downloadLink.DownloadUrl))
+        var downloadLinkResult = await _cloudStorageProvider.GenerateDownloadLinkAsync(storageObject);
+        if (downloadLinkResult.IsFailure || string.IsNullOrWhiteSpace(downloadLinkResult.Value))
             return UnprocessableEntity();
         
-        return Redirect(downloadLink.DownloadUrl);
+        return Redirect(downloadLinkResult.Value);
     }
     
     [HttpGet("Local/{storageObjectId}")]
