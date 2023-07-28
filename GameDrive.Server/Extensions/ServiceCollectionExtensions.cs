@@ -4,6 +4,8 @@ using GameDrive.Server.Models.Options;
 using GameDrive.Server.Services;
 using GameDrive.Server.Services.Repositories;
 using GameDrive.Server.Services.Storage;
+using GameDrive.Server.Tasks;
+using GameDrive.Server.Tasks.Repeating;
 using GameDrive.Server.Tasks.Startup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +17,20 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGameDriveServices(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddTransient<IRepeatingTask, TriggerReplicationRepeatingTask>();
+        
         serviceCollection.AddScoped<TemporaryStorageProvider>();
         serviceCollection.AddScoped<ICloudStorageProvider, LocalCloudStorageProvider>();
+        serviceCollection.AddScoped<IStorageReplicationService, StorageReplicationService>();
         serviceCollection.AddScoped<StorageService>();
         serviceCollection.AddScoped<AuthenticationService>();
         serviceCollection.AddScoped<ManifestService>();
         serviceCollection.AddScoped<IStorageObjectRepository, StorageObjectRepository>();
         serviceCollection.AddScoped<IUserRepository, UserRepository>();
         serviceCollection.AddScoped<IBucketRepository, BucketRepository>();
+        serviceCollection.AddSingleton<IRepeatingTaskService, RepeatingTaskService>();
         serviceCollection.AddHostedService<MigrateDatabaseTask>();
+        serviceCollection.AddHostedService<InitialiseRepeatingTaskService>();
         return serviceCollection;
     }
     
@@ -49,6 +56,8 @@ public static class ServiceCollectionExtensions
                     x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly)
                 );
             }
+
+            options.EnableSensitiveDataLogging(false);
         });
         
         return serviceCollection;
