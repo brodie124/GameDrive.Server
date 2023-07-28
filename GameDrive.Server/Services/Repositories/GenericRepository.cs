@@ -36,19 +36,16 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
     public async Task UpdateAsync(T entity)
     {
         _dbContext.Update(entity);
-        await SaveChangesAsync();
     }
 
     public async Task RemoveAsync(T entity)
     {
         _dbContext.Set<T>().Remove(entity);
-        await SaveChangesAsync();
     }
 
     public async Task RemoveRangeAsync(IEnumerable<T> entities)
     {
         _dbContext.Set<T>().RemoveRange(entities);
-        await SaveChangesAsync();
     }
 
     public async Task SaveChangesAsync()

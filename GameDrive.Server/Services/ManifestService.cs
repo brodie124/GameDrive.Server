@@ -88,6 +88,7 @@ public class ManifestService
         {
             storageObject.MarkForDeletion();
             await _storageObjectRepository.UpdateAsync(storageObject);
+            await _storageObjectRepository.SaveChangesAsync();
             return new CompareManifestResponseEntry(crossReferenceId, FileUploadState.Ignore, FileDiffState.Removed);
         }
         
