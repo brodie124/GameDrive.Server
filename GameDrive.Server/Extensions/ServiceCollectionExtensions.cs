@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGameDriveServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<TemporaryStorageProvider>();
-        serviceCollection.AddScoped<IStorageProvider, LocalStorageProvider>();
+        serviceCollection.AddScoped<ICloudStorageProvider, LocalCloudStorageProvider>();
         serviceCollection.AddScoped<StorageService>();
         serviceCollection.AddScoped<AuthenticationService>();
         serviceCollection.AddScoped<ManifestService>();

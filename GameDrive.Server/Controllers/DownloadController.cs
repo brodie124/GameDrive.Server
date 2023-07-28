@@ -10,15 +10,15 @@ namespace GameDrive.Server.Controllers;
 public class DownloadController : ControllerBase
 {
     private readonly IStorageObjectRepository _storageObjectRepository;
-    private readonly IStorageProvider _storageProvider;
+    private readonly ICloudStorageProvider _cloudStorageProvider;
 
     public DownloadController(
         IStorageObjectRepository storageObjectRepository,
-        IStorageProvider storageProvider
+        ICloudStorageProvider cloudStorageProvider
     )
     {
         _storageObjectRepository = storageObjectRepository;
-        _storageProvider = storageProvider;
+        _cloudStorageProvider = cloudStorageProvider;
     }
 
     [HttpGet("{storageObjectId}")]
@@ -31,7 +31,7 @@ public class DownloadController : ControllerBase
         if (storageObject is null)
             return NotFound();
 
-        var downloadLink = await _storageProvider.GenerateDownloadLinkAsync(storageObject);
+        var downloadLink = await _cloudStorageProvider.GenerateDownloadLinkAsync(storageObject);
         if (!downloadLink.Success || string.IsNullOrWhiteSpace(downloadLink.DownloadUrl))
             return UnprocessableEntity();
         

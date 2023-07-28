@@ -6,19 +6,19 @@ namespace GameDrive.Server.Services.Storage;
 public class StorageService
 {
     private readonly ILogger<StorageService> _logger;
-    private readonly IStorageProvider _storageProvider;
+    private readonly ICloudStorageProvider _cloudStorageProvider;
     private readonly IStorageObjectRepository _storageObjectRepository;
     private readonly IBucketRepository _bucketRepository;
 
     public StorageService(
         ILogger<StorageService> logger,
-        IStorageProvider storageProvider,
+        ICloudStorageProvider cloudStorageProvider,
         IStorageObjectRepository storageObjectRepository,
         IBucketRepository bucketRepository
     )
     {
         _logger = logger;
-        _storageProvider = storageProvider;
+        _cloudStorageProvider = cloudStorageProvider;
         _storageObjectRepository = storageObjectRepository;
         _bucketRepository = bucketRepository;
     }
@@ -46,7 +46,7 @@ public class StorageService
                 await _bucketRepository.AddAsync(bucket);
             }
 
-            var result = await _storageProvider.SaveObjectAsync(saveStorageObjectRequest, cancellationToken);
+            var result = await _cloudStorageProvider.SaveObjectAsync(saveStorageObjectRequest, cancellationToken);
             if (!result.Success)
                 return null;
 
