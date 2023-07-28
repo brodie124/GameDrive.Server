@@ -19,10 +19,10 @@ execute migration-related operations because the tool no longer "knows" where to
 To inform the tool where to find the migrations, append one of the following set of CLI args depending on which
 provider you are creating a migration for.
 
-| Provider | CLI Args                                                                      |
-|----------|-------------------------------------------------------------------------------|
-| MySQL    | `--project ../GameDrive.Server.Migrations.MySQL -- --provider Mysql`          |
-| SQLite   | `--project ../GameDrive.Server.Migrations.MySQL -- --provider Mysql`          |
+| Provider | CLI Args                                                               |
+|----------|------------------------------------------------------------------------|
+| MySQL    | `--project ../GameDrive.Server.Migrations.MySQL -- --provider Mysql`   |
+| SQLite   | `--project ../GameDrive.Server.Migrations.SQLite -- --provider Sqlite` |
 
 
 For example, to create a new MySQL migration you would execute the following command:
