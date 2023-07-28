@@ -59,7 +59,7 @@ public class StorageService
                 await _storageObjectRepository.RemoveAsync(existingStorageObject);
             }
 
-            var storageObject = result.Value[0];
+            var storageObject = result.Value[0]; // TODO: iterate over the list of results
             storageObject.BucketId = bucket.Id;
 
             await _storageObjectRepository.AddAsync(storageObject);
