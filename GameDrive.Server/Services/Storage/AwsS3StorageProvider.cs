@@ -48,8 +48,7 @@ public class AwsS3StorageProvider : ICloudStorageProvider
                 ChecksumSHA1 = obj.FileHash
             }, cancellationToken);
         }
-
-
+        
         return Result.Success();
     }
 
