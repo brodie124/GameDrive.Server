@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text.Json;
 using GameDrive.Server.Attributes;
 using GameDrive.Server.Domain.Models.Requests;
@@ -48,11 +49,8 @@ public class UploadController : ControllerBase
         ).Value;
 
         var reader = new MultipartReader(boundary, Request.Body);
-        
-        var temporaryFiles = new Dictionary<string, Guid>();
+        var temporaryFiles = new List<TemporaryUploadFile>();
         var uploadFileRequests = new List<UploadFileRequest>();
-        
-
         while(true)
         {
             var section = await reader.ReadNextSectionAsync(cancellationToken);
@@ -81,7 +79,11 @@ public class UploadController : ControllerBase
                 continue;
             
             var saveTempResult = await _temporaryStorageProvider.SaveFileAsync(section.Body);
-            temporaryFiles.Add(contentDisposition.Name.Value, saveTempResult.Key);
+            temporaryFiles.Add(new TemporaryUploadFile(
+                TemporaryFileKey: saveTempResult.Key,
+                MultiPartName: contentDisposition.Name.Value,
+                FileHash: saveTempResult.Hash
+            ));
         }
 
         if (uploadFileRequests.Count == 0)
@@ -94,9 +96,14 @@ public class UploadController : ControllerBase
             return ApiResponse<bool>.Failure("No files were successfully uploaded");
         
         var saveRequests = new List<SaveStorageObjectRequest>();
-        foreach (var (multiPartName, temporaryFileKey) in temporaryFiles)
+        foreach (var file in temporaryFiles)
         {
-            var uploadFileRequest = uploadFileRequests.First(x => x.MultiPartName == multiPartName);
+            var uploadFileRequest = uploadFileRequests.First(x => x.MultiPartName == file.MultiPartName);
+            if (file.FileHash != uploadFileRequest.FileHash)
+            {
+                return ApiResponse<bool>.Failure($"Checksum mismatch on file '{uploadFileRequest.GdFilePath}'");
+            }
+            
             var saveStorageObjectRequest = new SaveStorageObjectRequest(
                 OwnerId: jwtData.UserId,
                 BucketId: uploadFileRequest.BucketId,
@@ -105,7 +112,7 @@ public class UploadController : ControllerBase
                 FileHash: uploadFileRequest.FileHash,
                 FileCreatedDate: uploadFileRequest.FileCreatedDate,
                 FileLastModifiedDate: uploadFileRequest.FileLastModifiedDate,
-                TemporaryFileKey: temporaryFileKey
+                TemporaryFileKey: file.TemporaryFileKey
             );
             
             saveRequests.Add(saveStorageObjectRequest);
@@ -114,4 +121,11 @@ public class UploadController : ControllerBase
         await _storageService.SaveFilesAsync(saveRequests, cancellationToken);
         return true;
     }
+
+
+    public record TemporaryUploadFile(
+        Guid TemporaryFileKey,
+        string MultiPartName,
+        string FileHash
+    );
 }

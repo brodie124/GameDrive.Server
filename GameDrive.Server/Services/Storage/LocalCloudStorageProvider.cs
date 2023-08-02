@@ -33,7 +33,7 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
             await using var writeStream = new StreamWriter(filePath);
             await using var temporaryFileStream =
-                _temporaryStorageProvider.GetFile((Guid)storageObject.TemporaryFileKey);
+                _temporaryStorageProvider.GetFileStream((Guid)storageObject.TemporaryFileKey);
 
             await temporaryFileStream.CopyToAsync(writeStream.BaseStream, cancellationToken);
             await writeStream.FlushAsync();

@@ -20,7 +20,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IRepeatingTask, TriggerReplicationRepeatingTask>();
         
         serviceCollection.AddScoped<TemporaryStorageProvider>();
-        serviceCollection.AddScoped<ICloudStorageProvider, LocalCloudStorageProvider>();
+        // serviceCollection.AddScoped<ICloudStorageProvider, LocalCloudStorageProvider>();
+        serviceCollection.AddScoped<ICloudStorageProvider, AwsS3StorageProvider>();
         serviceCollection.AddScoped<IStorageReplicationService, StorageReplicationService>();
         serviceCollection.AddScoped<StorageService>();
         serviceCollection.AddScoped<AuthenticationService>();

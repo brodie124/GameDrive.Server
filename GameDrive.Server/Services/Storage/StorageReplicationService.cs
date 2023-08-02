@@ -69,6 +69,12 @@ public class StorageReplicationService : IStorageReplicationService
 
     private async Task ReplicateStorageObjects(List<ReplicationQueueItem> queueItems)
     {
+        if (queueItems.Count <= 0)
+        {
+            _logger.LogInformation("Skipping storage object replication - queue empty");
+            return;
+        }
+        
         _logger.LogInformation("Starting storage object replication");
         _logger.LogInformation("- Fetching game objects");
         var storageObjectIds = queueItems.Select(x => x.StorageObjectId).ToArray();

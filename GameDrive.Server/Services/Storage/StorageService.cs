@@ -118,7 +118,7 @@ public class StorageService
             BucketId = request.BucketId,
 
             FileSizeBytes = 0,
-            FileHash = "",
+            FileHash = request.FileHash,
 
             ClientRelativePath = request.GdFilePath,
 

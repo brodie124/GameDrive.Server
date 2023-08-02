@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using GameDrive.Server.Models.Options;
 using Microsoft.Extensions.Options;
 
@@ -23,16 +24,37 @@ public class TemporaryStorageProvider
         var key = Guid.NewGuid();
         var relativePath = MakeTemporaryPath(key);
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
-        await using var writeStream = new StreamWriter(filePath);
-        await source.CopyToAsync(writeStream.BaseStream);
+        await using var writeStream = File.OpenWrite(filePath);
+
+        using var sha1 = SHA1.Create();
+        sha1.Initialize();
+
+        var buffer = new byte[256];
+        while (true)
+        {
+            var bytesRead = await source.ReadAsync(buffer, 0, buffer.Length);
+            if (bytesRead <= 0)
+            {
+                sha1.TransformFinalBlock(buffer, 0, 0);
+                break;
+            }
+            
+            sha1.TransformBlock(buffer, 0, bytesRead, null, 0);
+            await writeStream.WriteAsync(buffer, 0, bytesRead);
+        }
+        
         await writeStream.FlushAsync();
+        
+        ArgumentNullException.ThrowIfNull(sha1.Hash);
+        var fileHash = Convert.ToBase64String(sha1.Hash);
+        
         return new SaveFileResult(
             Key: key,
-            Hash: string.Empty
+            Hash: fileHash
         );
     }
     
-    public Stream GetFile(Guid key)
+    public Stream GetFileStream(Guid key)
     {
         var relativePath = MakeTemporaryPath(key);
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
@@ -42,6 +64,17 @@ public class TemporaryStorageProvider
         var readStream = new StreamReader(filePath);
         return readStream.BaseStream;
     }
+    
+    public string GetFilePath(Guid key)
+    {
+        var relativePath = MakeTemporaryPath(key);
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
+        if (!File.Exists(filePath))
+            throw new InvalidOperationException("Specified key cannot be found in temp storage");
+
+        return filePath;
+    }
+
 
     public Task<bool> HasFileAsync(Guid key)
     {
