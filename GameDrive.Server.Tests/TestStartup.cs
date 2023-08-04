@@ -18,6 +18,7 @@ public class TestStartup : Startup
     {
         return new ConfigurationBuilder()
             .SetBasePath(environment.ContentRootPath)
+            .AddEnvironmentVariables()
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
     }

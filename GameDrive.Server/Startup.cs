@@ -10,23 +10,23 @@ public class Startup
 
     public Startup(IWebHostEnvironment environment)
     {
-        InitialiseConfiguration(environment);
+        Configuration = InitialiseConfiguration(environment);
     }
 
-    public void InitialiseConfiguration(IWebHostEnvironment environment)
+    public IConfiguration InitialiseConfiguration(IWebHostEnvironment environment)
     {
         var builder = CreateConfigurationBuilder(environment);
-        Configuration = builder.Build();
+        return builder.Build();
     }
-
 
     public virtual IConfigurationBuilder CreateConfigurationBuilder(IWebHostEnvironment environment)
     {
         return new ConfigurationBuilder()
             .SetBasePath(environment.ContentRootPath)
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
             .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
-            .AddJsonFile("appsettings.localdev.Development.json", optional: true, reloadOnChange: true);;
+            .AddJsonFile("appsettings.localdev.Development.json", optional: true, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
     }
     
     public virtual void ConfigureServices(IServiceCollection services)
