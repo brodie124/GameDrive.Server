@@ -38,7 +38,7 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
                 continue;
             }
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.StoragePath);
             await using var writeStream = new StreamWriter(filePath);
             await using var temporaryFileStream =
                 _temporaryStorageProvider.GetFileStream((Guid)storageObject.TemporaryFileKey);
@@ -63,7 +63,7 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
 
     public async Task<Result> DeleteObjectAsync(StorageObject storageObject)
     {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.StoragePath);
         try
         {
             File.Delete(filePath);

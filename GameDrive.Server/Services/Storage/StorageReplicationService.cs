@@ -100,7 +100,7 @@ public class StorageReplicationService : IStorageReplicationService
             // TODO: track replication date/time
             var temporaryFileKey = (Guid) obj.TemporaryFileKey!;
             obj.TemporaryFileKey = null;
-            obj.GameDrivePath = saveResult.StoragePath;
+            obj.StoragePath = saveResult.StoragePath;
             obj.ReplicationDate = DateTime.Now;
             await _storageObjectRepository.UpdateAsync(obj);
             await _temporaryStorageProvider.DeleteFileAsync(temporaryFileKey);

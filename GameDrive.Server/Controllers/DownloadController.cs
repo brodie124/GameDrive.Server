@@ -49,10 +49,10 @@ public class DownloadController : ControllerBase
             return NotFound();
 
         // FIXME: this path needs to be validated (i.e. jailed)
-        if (!System.IO.File.Exists(storageObject.GameDrivePath))
+        if (!System.IO.File.Exists(storageObject.StoragePath))
             return NotFound();
 
-        var stream = System.IO.File.OpenRead(storageObject.GameDrivePath);
+        var stream = System.IO.File.OpenRead(storageObject.StoragePath);
         return new FileStreamResult(stream, MediaTypeNames.Application.Octet)
         {
             FileDownloadName = storageObject.ClientRelativePath

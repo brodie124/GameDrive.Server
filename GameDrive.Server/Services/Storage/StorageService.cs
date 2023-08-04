@@ -126,7 +126,7 @@ public class StorageService
             CreatedDate = request.FileCreatedDate,
             LastModifiedDate = request.FileLastModifiedDate,
 
-            GameDrivePath = null,
+            StoragePath = null,
             TemporaryFileKey = temporaryFileKey
         };
     }

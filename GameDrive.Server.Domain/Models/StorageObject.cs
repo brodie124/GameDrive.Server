@@ -21,7 +21,7 @@ public class StorageObject
     public DateTime CreatedDate { get; set; }
     public DateTime LastModifiedDate { get; set; }
    
-    public string? GameDrivePath { get; set; } = default!;
+    public string? StoragePath { get; set; } = default!;
 
     public Guid? TemporaryFileKey { get; set; } = null;
 
