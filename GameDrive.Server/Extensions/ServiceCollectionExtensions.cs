@@ -71,6 +71,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
         serviceCollection.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        serviceCollection.Configure<AwsOptions>(configuration.GetSection(AwsOptions.SectionName));
         serviceCollection.Configure<TemporaryStorageOptions>(configuration.GetSection(TemporaryStorageOptions.SectionName));
         return serviceCollection;
     }
