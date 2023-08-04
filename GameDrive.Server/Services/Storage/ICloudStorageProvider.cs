@@ -27,6 +27,7 @@ public record SaveStorageObjectRequest(
 public record SaveStorageObjectResult(
     Guid StorageObjectId,
     bool Success,
+    string? StoragePath = null,
     string? ErrorMessage = null,
     Exception? InnerException = null
 );

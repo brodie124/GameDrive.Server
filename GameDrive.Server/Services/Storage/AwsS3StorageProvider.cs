@@ -63,7 +63,8 @@ public class AwsS3StorageProvider : ICloudStorageProvider
                 
                 results.Add(new SaveStorageObjectResult(
                     StorageObjectId: obj.Id,
-                    Success: true
+                    Success: true,
+                    StoragePath: objectKey
                 ));
             }
             catch (AmazonServiceException ex)

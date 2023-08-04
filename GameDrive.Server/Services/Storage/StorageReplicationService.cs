@@ -14,6 +14,7 @@ public class StorageReplicationService : IStorageReplicationService
     private readonly ILogger<StorageReplicationService> _logger;
     private readonly IStorageObjectRepository _storageObjectRepository;
     private readonly ICloudStorageProvider _cloudStorageProvider;
+    private readonly TemporaryStorageProvider _temporaryStorageProvider;
 
     private readonly List<ReplicationQueueItem> _replicationQueue = new List<ReplicationQueueItem>();
     private readonly SemaphoreSlim _replicationSemaphoreSlim = new SemaphoreSlim(1);
@@ -21,12 +22,14 @@ public class StorageReplicationService : IStorageReplicationService
     public StorageReplicationService(
         ILogger<StorageReplicationService> logger,
         IStorageObjectRepository storageObjectRepository,
-        ICloudStorageProvider cloudStorageProvider
+        ICloudStorageProvider cloudStorageProvider,
+        TemporaryStorageProvider temporaryStorageProvider
     )
     {
         _logger = logger;
         _storageObjectRepository = storageObjectRepository;
         _cloudStorageProvider = cloudStorageProvider;
+        _temporaryStorageProvider = temporaryStorageProvider;
     }
 
     public async Task ProcessReplicationQueue()
@@ -95,8 +98,12 @@ public class StorageReplicationService : IStorageReplicationService
                 continue;
             
             // TODO: track replication date/time
+            var temporaryFileKey = (Guid) obj.TemporaryFileKey!;
             obj.TemporaryFileKey = null;
+            obj.GameDrivePath = saveResult.StoragePath;
+            obj.ReplicationDate = DateTime.Now;
             await _storageObjectRepository.UpdateAsync(obj);
+            await _temporaryStorageProvider.DeleteFileAsync(temporaryFileKey);
         }
 
         await _storageObjectRepository.SaveChangesAsync();

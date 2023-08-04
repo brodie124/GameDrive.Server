@@ -75,6 +75,19 @@ public class TemporaryStorageProvider
         return filePath;
     }
 
+    public Task<bool> DeleteFileAsync(Guid key)
+    {
+        try
+        {
+            var path = MakeTemporaryPath(key);
+            File.Delete(path);
+            return Task.FromResult(true);
+        }
+        catch (IOException)
+        {
+            return Task.FromResult(false);
+        }
+    }
 
     public Task<bool> HasFileAsync(Guid key)
     {

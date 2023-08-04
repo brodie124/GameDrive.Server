@@ -21,13 +21,14 @@ public class StorageObject
     public DateTime CreatedDate { get; set; }
     public DateTime LastModifiedDate { get; set; }
    
-    public string GameDrivePath { get; set; } = default!;
+    public string? GameDrivePath { get; set; } = default!;
 
     public Guid? TemporaryFileKey { get; set; } = null;
 
     [NotMapped]
     public bool RequiresReplication => TemporaryFileKey is not null;
-
+    
+    public DateTime? ReplicationDate { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedDate { get; set; }
 
