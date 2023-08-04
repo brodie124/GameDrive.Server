@@ -36,6 +36,7 @@ public class UploadController : ControllerBase
     // FIXME: lower the number of parameters for this function
     [HttpPost]
     [DisableFormValueModelBinding]
+    [DisableRequestSizeLimit]
     public async Task<ApiResponse<bool>> UploadFileAsync(
         CancellationToken cancellationToken = default
     )
