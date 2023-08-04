@@ -28,10 +28,27 @@ public class StorageService
     }
 
     public async Task SaveFilesAsync(
-        IEnumerable<SaveStorageObjectRequest> saveRequests,
+        ICollection<SaveStorageObjectRequest> saveRequests,
         CancellationToken cancellationToken = default    
     )
     {
+        if (saveRequests.Count <= 0)
+            return;
+        
+        var bucketId = saveRequests.First().BucketId;
+        var bucketName = saveRequests.First().BucketName;
+        if (saveRequests.Any(x => x.BucketId != bucketId))
+        {
+            throw new InvalidOperationException(
+                "All files specified in a multipart upload must belong to the same bucket.");
+        }
+        
+        var bucket = await GetOrCreateBucketAsync(new Bucket
+        {
+            Id = bucketId,
+            Name = bucketName
+        });
+
         foreach (var request in saveRequests)
         {
             var temporaryFileExists = await _temporaryStorageProvider.HasFileAsync(request.TemporaryFileKey);
@@ -39,12 +56,6 @@ public class StorageService
                 throw new InvalidOperationException("Attempted to save file but it no longer exists.");
 
             var storageObject = ConvertSaveRequestToStorageObject(request, request.TemporaryFileKey);
-            var bucket = await GetOrCreateBucketAsync(new Bucket
-            {
-                Id = request.BucketId,
-                Name = request.BucketName
-            });
-
             var existingStorageObject = await GetExistingStorageObject(bucket.Id, request.GdFilePath);
             if (existingStorageObject is not null)
             {
