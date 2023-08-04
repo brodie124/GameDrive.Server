@@ -1,14 +1,13 @@
 using GameDrive.Server.Domain.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GameDrive.Server.Tests;
 
 public class TestStartup : Startup
 {
-    public TestStartup(IConfiguration configuration) : base(configuration)
+    public TestStartup(IWebHostEnvironment environment) : base(environment)
     {
     }
 
