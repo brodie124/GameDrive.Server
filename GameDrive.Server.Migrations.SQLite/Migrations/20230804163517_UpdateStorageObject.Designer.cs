@@ -3,6 +3,7 @@ using System;
 using GameDrive.Server.Domain.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameDrive.Server.Migrations.SQLite.Migrations
 {
     [DbContext(typeof(GameDriveDbContext))]
-    partial class GameDriveDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230804163517_UpdateStorageObject")]
+    partial class UpdateStorageObject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");

@@ -60,10 +60,6 @@ namespace GameDrive.Server.Migrations.MySQL.Migrations
                     b.Property<long>("FileSizeBytes")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("GameDrivePath")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -72,6 +68,12 @@ namespace GameDrive.Server.Migrations.MySQL.Migrations
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReplicationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("StoragePath")
+                        .HasColumnType("longtext");
 
                     b.Property<Guid?>("TemporaryFileKey")
                         .HasColumnType("char(36)");
