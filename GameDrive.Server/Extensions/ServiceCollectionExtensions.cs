@@ -44,7 +44,9 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddDbContext<GameDriveDbContext>(options =>
         {
             var provider = configuration.GetValue("provider", DatabaseProvider.Mysql.Name).ToLower();
-            if (provider == DatabaseProvider.Mysql.Name.ToLower()) {
+            if (provider == DatabaseProvider.Mysql.Name.ToLower())
+            {
+                ArgumentNullException.ThrowIfNull(databaseOptions.MysqlConnectionString);
                 var serverVersion = MySqlServerVersion.AutoDetect(databaseOptions.MysqlConnectionString);
                 options.UseMySql(databaseOptions.MysqlConnectionString, serverVersion,
                     x => x.MigrationsAssembly(DatabaseProvider.Mysql.Assembly));
@@ -52,6 +54,7 @@ public static class ServiceCollectionExtensions
             
             if (provider == DatabaseProvider.Sqlite.Name.ToLower())
             {
+                ArgumentNullException.ThrowIfNull(databaseOptions.SqliteConnectionString);
                 options.UseSqlite(
                     databaseOptions.SqliteConnectionString,
                     x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly)
