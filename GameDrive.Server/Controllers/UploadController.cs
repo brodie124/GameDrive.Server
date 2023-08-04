@@ -40,8 +40,8 @@ public class UploadController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        if(_hostEnvironment.IsProduction())
-            return ApiResponse<bool>.Failure("This feature is currently under development.");
+        // if(_hostEnvironment.IsProduction())
+        //     return ApiResponse<bool>.Failure("This feature is currently under development.");
         
         var jwtData = Request.GetJwtDataFromRequest();
         var boundary = HeaderUtilities.RemoveQuotes(
