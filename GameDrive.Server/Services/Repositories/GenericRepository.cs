@@ -15,8 +15,6 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
     
     public async Task AddAsync(T entity)
     {
-        var model = _dbContext.Entry(entity);
-        model.State = EntityState.Modified;
         await _dbContext.Set<T>().AddAsync(entity);
     }
 
