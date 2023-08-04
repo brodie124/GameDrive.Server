@@ -1,4 +1,5 @@
 using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using CSharpFunctionalExtensions;
@@ -31,31 +32,52 @@ public class AwsS3StorageProvider : ICloudStorageProvider
         );
     }
 
-    public async Task<Result> SaveObjectsAsync(IEnumerable<StorageObject> storageObjects,
+    public async Task<IReadOnlyList<SaveStorageObjectResult>> SaveObjectsAsync(IEnumerable<StorageObject> storageObjects,
         CancellationToken cancellationToken = default)
     {
         // start the multipart upload
+        var results = new List<SaveStorageObjectResult>();
         foreach (var obj in storageObjects)
         {
             if (obj.TemporaryFileKey is null)
             {
-                throw new InvalidOperationException("Temporary File Key cannot be null");
+                results.Add(new SaveStorageObjectResult(
+                    StorageObjectId: obj.Id,
+                    Success: false,
+                    ErrorMessage: "Temporary File Key cannot be null"
+                ));
                 continue;
             }
 
-            var objectKey = FileNameToObjectKey(obj);
+            var objectKey = ConvertFileNameToObjectKey(obj);
             var temporaryFilePath = _temporaryStorageProvider.GetFilePath((Guid)obj.TemporaryFileKey);
-            // TODO: handles errors & exceptions
-            var objects = await _awsClient.PutObjectAsync(new PutObjectRequest
+            try
             {
-                BucketName = BucketName,
-                Key = objectKey,
-                FilePath = temporaryFilePath,
-                ChecksumSHA1 = obj.FileHash
-            }, cancellationToken);
+                var putObjectResponse = await _awsClient.PutObjectAsync(new PutObjectRequest
+                {
+                    BucketName = BucketName,
+                    Key = objectKey,
+                    FilePath = temporaryFilePath,
+                    ChecksumSHA1 = obj.FileHash
+                }, cancellationToken);
+                
+                results.Add(new SaveStorageObjectResult(
+                    StorageObjectId: obj.Id,
+                    Success: true
+                ));
+            }
+            catch (AmazonServiceException ex)
+            {
+                results.Add(new SaveStorageObjectResult(
+                    StorageObjectId: obj.Id,
+                    Success: false,
+                    ErrorMessage: "An AWS exception occurred",
+                    InnerException: ex
+                ));
+            }
         }
 
-        return Result.Success();
+        return results;
     }
 
     public Task<Result<string>> GenerateDownloadLinkAsync(StorageObject storageObject)
@@ -69,7 +91,7 @@ public class AwsS3StorageProvider : ICloudStorageProvider
     }
 
 
-    private string FileNameToObjectKey(StorageObject storageObject)
+    private static string ConvertFileNameToObjectKey(StorageObject storageObject)
     {
         var fileNameHash = HashHelper.Sha1String(storageObject.ClientRelativePath);
         return $"{storageObject.OwnerId}/{fileNameHash}";

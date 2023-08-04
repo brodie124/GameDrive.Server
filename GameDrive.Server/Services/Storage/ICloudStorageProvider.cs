@@ -5,7 +5,7 @@ namespace GameDrive.Server.Services.Storage;
 
 public interface ICloudStorageProvider
 {
-    Task<Result> SaveObjectsAsync(
+    Task<IReadOnlyList<SaveStorageObjectResult>> SaveObjectsAsync(
         IEnumerable<StorageObject> storageObjects,
         CancellationToken cancellationToken = default
     );
@@ -22,4 +22,11 @@ public record SaveStorageObjectRequest(
     DateTime FileCreatedDate,
     DateTime FileLastModifiedDate,
     Guid TemporaryFileKey
+);
+
+public record SaveStorageObjectResult(
+    Guid StorageObjectId,
+    bool Success,
+    string? ErrorMessage = null,
+    Exception? InnerException = null
 );

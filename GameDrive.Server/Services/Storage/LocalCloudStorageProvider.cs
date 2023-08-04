@@ -16,7 +16,7 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
         _temporaryStorageProvider = temporaryStorageProvider;
     }
 
-    public async Task<Result> SaveObjectsAsync(
+    public async Task<IReadOnlyList<SaveStorageObjectResult>> SaveObjectsAsync(
         IEnumerable<StorageObject> storageObjects,
         CancellationToken cancellationToken = default
     )
@@ -25,10 +25,18 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
         if (!Directory.Exists("storage"))
             Directory.CreateDirectory("storage");
 
+        var results = new List<SaveStorageObjectResult>();
         foreach (var storageObject in storageObjects.ToList())
         {
             if (storageObject.TemporaryFileKey is null)
-                throw new InvalidOperationException("Upload called for object that has already been replicated");
+            {
+                results.Add(new SaveStorageObjectResult(
+                    StorageObjectId: storageObject.Id,
+                    Success: false,
+                    ErrorMessage: "Upload called for object that has already been replicated"
+                ));
+                continue;
+            }
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), storageObject.GameDrivePath);
             await using var writeStream = new StreamWriter(filePath);
@@ -37,9 +45,13 @@ public class LocalCloudStorageProvider : ICloudStorageProvider
 
             await temporaryFileStream.CopyToAsync(writeStream.BaseStream, cancellationToken);
             await writeStream.FlushAsync();
+            results.Add(new SaveStorageObjectResult(
+                StorageObjectId: storageObject.Id,
+                Success: true
+            ));
         }
 
-        return Result.Success();
+        return results;
     }
 
     public Task<Result<string>> GenerateDownloadLinkAsync(StorageObject storageObject)

@@ -83,22 +83,23 @@ public class StorageReplicationService : IStorageReplicationService
 
         _logger.LogInformation("- Uploading objects to the cloud provider");
         var result = await _cloudStorageProvider.SaveObjectsAsync(storageObjects);
-        if (result.IsFailure)
-        {
-            _logger.LogError("Failed to {Length} replicate storage objects", storageObjectIds.Length);
-            return;
-        }
+        var failedCount = result.Count(x => !x.Success);
+        if (failedCount > 0)
+            _logger.LogError("Failed to {Length} replicate storage objects", failedCount);
 
         _logger.LogInformation("- Updating the records in the database");
         foreach (var obj in storageObjects)
         {
+            var saveResult = result.First(x => x.StorageObjectId == obj.Id);
+            if (!saveResult.Success)
+                continue;
+            
             // TODO: track replication date/time
             obj.TemporaryFileKey = null;
             await _storageObjectRepository.UpdateAsync(obj);
         }
 
         await _storageObjectRepository.SaveChangesAsync();
-
         _logger.LogInformation("Finished storage object replication");
     }
 }
