@@ -7,9 +7,15 @@ public class Startup
 {
     public IConfiguration Configuration { get; }
     
-    public Startup(IConfiguration configuration)
+    public Startup(IWebHostEnvironment environment)
     {
-        Configuration = configuration;
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(environment.ContentRootPath)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
+            .AddJsonFile("appsettings.localdev.Development.json");
+
+        Configuration = builder.Build();
     }
     
     public virtual void ConfigureServices(IServiceCollection services)
