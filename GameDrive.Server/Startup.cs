@@ -13,7 +13,7 @@ public class Startup
             .SetBasePath(environment.ContentRootPath)
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
-            .AddJsonFile("appsettings.localdev.Development.json");
+            .AddJsonFile("appsettings.localdev.Development.json", optional: true, reloadOnChange: true);
 
         Configuration = builder.Build();
     }
