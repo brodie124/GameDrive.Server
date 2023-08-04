@@ -20,7 +20,7 @@ public class AccountControllerTests
         var webHostBuilder = new WebHostBuilder()
             .UseDevelopmentConfiguration()
             .UseTestSqliteInMemoryDatabase()
-            .UseStartup<Startup>();
+            .UseStartup<TestStartup>();
         
         var server = new TestServer(webHostBuilder);
         _httpClient = server.CreateClient();

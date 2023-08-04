@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using GameDrive.Server.Extensions;
 using GameDrive.Server.Models.Options;
 
@@ -5,17 +6,27 @@ namespace GameDrive.Server;
 
 public class Startup
 {
-    public IConfiguration Configuration { get; }
-    
+    public IConfiguration Configuration { get; private set; }
+
     public Startup(IWebHostEnvironment environment)
     {
-        var builder = new ConfigurationBuilder()
+        InitialiseConfiguration(environment);
+    }
+
+    public void InitialiseConfiguration(IWebHostEnvironment environment)
+    {
+        var builder = CreateConfigurationBuilder(environment);
+        Configuration = builder.Build();
+    }
+
+
+    public virtual IConfigurationBuilder CreateConfigurationBuilder(IWebHostEnvironment environment)
+    {
+        return new ConfigurationBuilder()
             .SetBasePath(environment.ContentRootPath)
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
-            .AddJsonFile("appsettings.localdev.Development.json", optional: true, reloadOnChange: true);
-
-        Configuration = builder.Build();
+            .AddJsonFile("appsettings.localdev.Development.json", optional: true, reloadOnChange: true);;
     }
     
     public virtual void ConfigureServices(IServiceCollection services)
