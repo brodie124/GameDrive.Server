@@ -94,7 +94,7 @@ public class AwsS3StorageProvider : ICloudStorageProvider
 
     private static string ConvertFileNameToObjectKey(StorageObject storageObject)
     {
-        var fileNameHash = HashHelper.Sha1String(storageObject.ClientRelativePath);
-        return $"{storageObject.OwnerId}/{fileNameHash}";
+        var fileNameHash = HashHelper.Sha1String(storageObject.ClientRelativePath).Replace("/", "_");
+        return $"{storageObject.OwnerId}/{storageObject.BucketId}/{fileNameHash}";
     }
 }
