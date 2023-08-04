@@ -2,3 +2,4 @@ storage/
 storage/**
 temp/
 temp/**
+appsettings.DesktopDev.json
