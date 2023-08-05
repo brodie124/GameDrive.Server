@@ -26,7 +26,12 @@ public class TestStartup : Startup
     public override void ConfigureServices(IServiceCollection services)
     {
         base.ConfigureServices(services);
-        services.AddTransient<IOptions<AwsOptions>>((_) => new OptionsWrapper<AwsOptions>(new AwsOptions() { AccessKey = "", SecretAccessKey = "" }));
+        services.AddTransient<IOptions<AwsOptions>>((_) => new OptionsWrapper<AwsOptions>(new AwsOptions()
+        {
+            AccessKey = "", 
+            SecretAccessKey = "",
+            BucketName = "",
+        }));
     }
 
     public override void Configure(IApplicationBuilder app, IWebHostEnvironment env)
