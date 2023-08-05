@@ -14,7 +14,7 @@ public class AwsS3StorageProvider : ICloudStorageProvider
 {
     private readonly TemporaryStorageProvider _temporaryStorageProvider;
     private readonly IAmazonS3 _awsClient;
-    private const string BucketName = "gamedrive-user-saves";
+    private readonly string _bucketName;
 
     public AwsS3StorageProvider(
         IOptions<AwsOptions> awsOptions,
@@ -23,8 +23,10 @@ public class AwsS3StorageProvider : ICloudStorageProvider
     {
         ArgumentNullException.ThrowIfNull(awsOptions.Value.AccessKey);
         ArgumentNullException.ThrowIfNull(awsOptions.Value.SecretAccessKey);
+        ArgumentNullException.ThrowIfNull(awsOptions.Value.BucketName);
         
         _temporaryStorageProvider = temporaryStorageProvider;
+        _bucketName = awsOptions.Value.BucketName;
         _awsClient = new AmazonS3Client(
             awsAccessKeyId: awsOptions.Value.AccessKey,
             awsSecretAccessKey: awsOptions.Value.SecretAccessKey,
@@ -55,7 +57,7 @@ public class AwsS3StorageProvider : ICloudStorageProvider
             {
                 var putObjectResponse = await _awsClient.PutObjectAsync(new PutObjectRequest
                 {
-                    BucketName = BucketName,
+                    BucketName = _bucketName,
                     Key = objectKey,
                     FilePath = temporaryFilePath,
                     ChecksumSHA1 = obj.FileHash
