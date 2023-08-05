@@ -85,7 +85,17 @@ public class AwsS3StorageProvider : ICloudStorageProvider
 
     public Task<Result<string>> GenerateDownloadLinkAsync(StorageObject storageObject)
     {
-        throw new NotImplementedException();
+        var objectKey = ConvertFileNameToObjectKey(storageObject);
+        var preSignedUrl = _awsClient.GetPreSignedURL(new GetPreSignedUrlRequest
+        {
+            BucketName = _bucketName,
+            Key = objectKey,
+            Expires = DateTime.Now.AddMinutes(10)
+        });
+
+        return preSignedUrl is not null
+            ? Task.FromResult(Result.Success<string>(preSignedUrl))
+            : Task.FromResult(Result.Failure<string>("Could not generate download url for the specified storage object."));
     }
 
     public Task<Result> DeleteObjectAsync(StorageObject storageObject)
