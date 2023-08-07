@@ -50,6 +50,17 @@ public class AwsS3StorageProvider : ICloudStorageProvider
                 ));
                 continue;
             }
+            
+            var hasKey = await _temporaryStorageProvider.HasFileAsync((Guid) obj.TemporaryFileKey);
+            if (!hasKey)
+            {
+                results.Add(new SaveStorageObjectResult(
+                    StorageObjectId: obj.Id,
+                    Success: false,
+                    ErrorMessage: "Could not find specified file in temporary storage"
+                ));
+                continue;
+            }
 
             var objectKey = ConvertFileNameToObjectKey(obj);
             var temporaryFilePath = _temporaryStorageProvider.GetFilePath((Guid)obj.TemporaryFileKey);
