@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using GameDrive.Server.Domain.Models.Requests;
 using GameDrive.Server.Domain.Models.Responses;
 using GameDrive.Server.Domain.Models.TransferObjects;
+using GameDrive.Server.Tests.TestBed;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 
@@ -18,9 +19,7 @@ public class AccountControllerTests
         sqliteDatabase.ResetAndRestart();
         
         var webHostBuilder = new WebHostBuilder()
-            .UseDevelopmentConfiguration()
-            .UseTestSqliteInMemoryDatabase()
-            .UseStartup<TestStartup>();
+            .SetupTestEnvironment(sqliteDatabase);
         
         var server = new TestServer(webHostBuilder);
         _httpClient = server.CreateClient();

@@ -3,22 +3,27 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GameDrive.Server.Tests;
+namespace GameDrive.Server.Tests.TestBed;
 
 public class SqliteInMemoryDatabase
 {
-    private static SqliteInMemoryDatabase? _instance;
-    
-    private const string ConnectionString = "Data Source=GameDriveTestDb;Mode=Memory;Cache=Shared";
-    private readonly SqliteConnection _connection = new SqliteConnection(ConnectionString);
+    private readonly SqliteConnection _connection;
+    private readonly string _connectionString;
 
+    private SqliteInMemoryDatabase()
+    {
+        var randomId = Guid.NewGuid().ToString().Replace("-", "");
+        _connectionString = $"Data Source=GameDriveTestDb-{randomId};Mode=Memory;Cache=Shared";
+        _connection = new SqliteConnection(_connectionString);
+    }
+    
     public void ResetAndRestart()
     {
         _connection.Close();
         _connection.Open();
     }
 
-    public static void RegisterTestDbContext(IServiceCollection services)
+    public void RegisterTestDbContext(IServiceCollection services)
     {
         var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<GameDriveDbContext>));
         if (descriptor != null)
@@ -26,15 +31,13 @@ public class SqliteInMemoryDatabase
         
         services.AddDbContext<GameDriveDbContext>(options =>
         {
-            options.UseSqlite(ConnectionString, x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly));    
+            options.UseSqlite(_connectionString, x => x.MigrationsAssembly(DatabaseProvider.Sqlite.Assembly));    
         });
-        
     }
     
     public static SqliteInMemoryDatabase GetInstance()
     {
-        _instance ??= new SqliteInMemoryDatabase();
-        return _instance;
+        return new SqliteInMemoryDatabase();
     }
 }
 
