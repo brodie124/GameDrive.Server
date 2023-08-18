@@ -21,6 +21,7 @@ public class TemporaryStorageProviderTests
     [Fact]
     public async void SaveFileAsync_ReturnsCorrectHash()
     {
+        // Arrange
         var data = new byte[] { (byte) 'h', (byte) 'e', (byte) 'l', (byte) 'l', (byte) 'o',(byte) ' ',(byte) 'w',(byte) 'o', (byte) 'r', (byte) 'l', (byte) 'd' };
         var dataHash = HashHelper.Sha1String(data);
         var dataAltHash = IsolatedSha1(data);
@@ -29,10 +30,12 @@ public class TemporaryStorageProviderTests
         await stream.WriteAsync(data);
         stream.Position = 0;
         
+        // Act
         var result = await _sut.SaveFileAsync(stream);
         var path = _sut.GetFilePath(result.Key);
         var returnData = await File.ReadAllBytesAsync(path);
 
+        // Assert
         Assert.Equal(data.Length, returnData.Length);
         Assert.Equal(dataHash, dataAltHash);
         Assert.Equal(dataHash, result.Hash);
