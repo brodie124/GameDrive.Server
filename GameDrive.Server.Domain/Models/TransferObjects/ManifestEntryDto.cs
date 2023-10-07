@@ -18,7 +18,10 @@ public class ManifestEntryDto
     
     [JsonPropertyName("fileSize")]
     public long FileSize { get; set; }
-    
+
+    [JsonPropertyName("previousLastModifiedDate")]
+    public DateTime? ClientPreviousLastModifiedDate { get; set; }
+
     [JsonPropertyName("lastModifiedDate")]
     public DateTime LastModifiedDate { get; set; }
     

@@ -53,10 +53,15 @@ public class ManifestService
     {
         var crossReferenceId = entry?.Guid ?? Guid.Empty;
 
+        // If the file's last modified date is before the previously known value (on the client side) then maybe the user
+        // is intentionally replacing the file with an older value - we should report this as a conflict
+        if(entry?.ClientPreviousLastModifiedDate?.CompareTo(entry.LastModifiedDate) > 0) 
+            return new CompareManifestResponseEntry(crossReferenceId, FileUploadState.Conflict, FileDiffState.Conflict);
+
         if ((entry is null || entry.IsDeleted) && (storageObject is null || storageObject.IsDeleted))
             return new CompareManifestResponseEntry(crossReferenceId, FileUploadState.Ignore, FileDiffState.Removed);
         
-        // If the storage object does not exist then the client-side file must be new
+        // If the storage object does not exist theTn the client-side file must be new
         if (storageObject is null)
             return new CompareManifestResponseEntry(crossReferenceId, FileUploadState.UploadRequested, FileDiffState.New)
                 .WithEntry(entry);
